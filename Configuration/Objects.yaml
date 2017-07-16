@@ -1,0 +1,9 @@
+Kitsunet\ImageManipulation\Imagine\ImageService:
+  properties:
+    imageSizeCache:
+      object:
+        factoryObjectName: Neos\Flow\Cache\CacheManager
+        factoryMethodName: getCache
+        arguments:
+          1:
+            value: Neos_Media_ImageSize

@@ -1,0 +1,21 @@
+{
+    "name": "kitsunet/image-manipulation",
+    "type": "neos-package",
+    "description": "",
+    "license": "MIT",
+    "require": {
+        "neos/imagine": "*",
+        "neos/flow": "*",
+        "neos/media": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kitsunet\\ImageManipulation\\": "Classes"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kitsunet\\ImageManipulation\\Tests\\": "Tests"
+        }
+    }
+}
