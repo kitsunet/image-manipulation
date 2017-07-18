@@ -4,7 +4,8 @@ namespace Kitsunet\ImageManipulation\Imagine;
 use Imagine\Image\Box;
 use Imagine\Image\Point;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\ImageManipulationInterface;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\CropManipulationDescription;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 
 /**
  *
@@ -47,6 +48,16 @@ class CropManipulation implements ImageManipulationInterface
         $this->y = $y;
         $this->width = $width;
         $this->height = $height;
+    }
+
+    /**
+     * @param CropManipulationDescription $description
+     * @return static
+     */
+    public static function fromDescription(CropManipulationDescription $description)
+    {
+        $options = $description->getOptions();
+        return new static($options['x'], $options['y'], $options['width'], $options['height']);
     }
 
     /**

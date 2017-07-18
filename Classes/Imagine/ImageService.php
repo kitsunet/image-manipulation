@@ -6,9 +6,9 @@ use Imagine\Imagick\Image;
 use Imagine\Imagick\Imagine;
 use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
-use Kitsunet\ImageManipulation\ImageBlob\ImageBlob;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\ImageManipulationInterface;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Kitsunet\ImageManipulation\ImageBlob\PassthroughImageManipulation;
 use Neos\Cache\Frontend\VariableFrontend;
 use Neos\Flow\ResourceManagement\Exception;
@@ -17,12 +17,8 @@ use Neos\Flow\Configuration\Exception\InvalidConfigurationException;
 use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Flow\Utility\Environment;
-use Neos\Media\Domain\Model\Adjustment\AdjustmentInterface;
 use Neos\Utility\Arrays;
 use Neos\Utility\Unicode\Functions as UnicodeFunctions;
-use Neos\Media\Domain\Model\Adjustment\CropImageAdjustment;
-use Neos\Media\Domain\Model\Adjustment\ResizeImageAdjustment;
-use Neos\Media\Exception\ImageFileException;
 
 /**
  * @Flow\Scope("singleton")
@@ -67,35 +63,34 @@ class ImageService
 
     /**
      * @param PersistentResource $originalResource
-     * @param array $adjustments
+     * @param ManipulationDescriptionInterface[] $manipulationDescriptions
      * @return array resource, width, height as keys
-     * @throws ImageFileException
      * @throws InvalidConfigurationException
      * @throws Exception
      */
-    public function processImage(PersistentResource $originalResource, array $adjustments)
+    public function processImage(PersistentResource $originalResource, array $manipulationDescriptions)
     {
-        $manipulations = $this->mapAdjustmentsToManipulations($adjustments);
-        return $this->process($originalResource, $manipulations);
+        $blobMetadata = $this->prepareMetadata($originalResource);
+        $blob = ImagineImageBlob::fromStream($originalResource->getStream(), $blobMetadata);
+
+        $converter = new DescriptionToManipulationConverter($manipulationDescriptions, $blob);
+        $manipulations = $converter->getManipulationStack();
+        return $this->process($blob, $manipulations);
     }
 
     /**
-     * @param PersistentResource $originalResource
+     * @param ImageBlobInterface $blob
      * @param ImageManipulationInterface[] $manipulations
-     * @return ImageBlobInterface
-     * @throws ImageFileException
+     * @return array resource, width, height as keys
      */
-    public function process(PersistentResource $originalResource, array $manipulations)
+    public function process(ImageBlobInterface $blob, array $manipulations)
     {
-        $blobMetadata = $this->prepareMetadata($originalResource);
         // TODO: Special handling for SVG should be refactored at a later point.
-        if ($originalResource->getMediaType() === 'image/svg+xml') {
-            $blob = ImageBlob::fromStream($originalResource->getStream(), $blobMetadata);
+        if ($blob->getMetadata()->getProperty('mediaType') === 'image/svg+xml') {
             $newResource = $this->storeModifiedImageBlob($blob);
             return $this->prepareReturnValue($newResource, $blob->getSize());
         }
 
-        $blob = ImagineImageBlob::fromStream($originalResource->getStream(), $blobMetadata);
         if ($this->shouldHandleAnimatedGif($blob)) {
             $blob = $this->processAnimatedGif($blob, $manipulations);
         } else {
@@ -236,42 +231,6 @@ class ImageService
     }
 
     /**
-     * @param array $adjustments
-     * @return ImageManipulationInterface[]
-     */
-    protected function mapAdjustmentsToManipulations(array $adjustments)
-    {
-        // TODO: The translation of adjustments should happen via a simple meta format that is then translated by implementation specific factories
-        return array_map([$this, 'convertAdjustmentToManipulation'], $adjustments);
-    }
-
-    /**
-     * @param AdjustmentInterface $adjustment
-     * @return ImageManipulationInterface
-     */
-    protected function convertAdjustmentToManipulation(AdjustmentInterface $adjustment)
-    {
-        $manipulation = new PassthroughImageManipulation();
-        if ($adjustment instanceof CropImageAdjustment) {
-            $manipulation = new CropManipulation($adjustment->getX(), $adjustment->getY(), $adjustment->getWidth(), $adjustment->getHeight());
-        }
-
-        if ($adjustment instanceof ResizeImageAdjustment) {
-            if ($adjustment->getWidth() && !$adjustment->getHeight()) {
-                $manipulation = ResizeManipulation::toWidth($adjustment->getWidth());
-            }
-            if (!$adjustment->getWidth() && $adjustment->getHeight()) {
-                $manipulation = ResizeManipulation::toHeight($adjustment->getHeight());
-            }
-            if ($adjustment->getWidth() && $adjustment->getHeight()) {
-                $manipulation = ResizeManipulation::toDimensions($adjustment->getWidth(), $adjustment->getHeight());
-            }
-        }
-
-        return $manipulation;
-    }
-
-    /**
      * @param array $additionalOptions
      * @return array
      * @throws InvalidConfigurationException
@@ -304,7 +263,6 @@ class ImageService
      *
      * @param PersistentResource $resource
      * @return array
-     * @throws ImageFileException
      */
     public function getImageSize(PersistentResource $resource)
     {

@@ -46,4 +46,9 @@ interface BoxInterface
      * {@inheritdoc}
      */
     public function heighten($height);
+
+    /**
+     * @return array with width and height keys
+     */
+    public function toArray();
 }
