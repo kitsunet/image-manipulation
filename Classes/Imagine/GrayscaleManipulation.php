@@ -2,13 +2,24 @@
 namespace Kitsunet\ImageManipulation\Imagine;
 
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 
 /**
  *
  */
-class GrayscaleManipulation
+class GrayscaleManipulation implements ImageManipulationInterface
 {
     use ManipulationHelperTrait;
+
+    /**
+     * @param ManipulationDescriptionInterface $description
+     * @return static
+     */
+    public static function fromDescription(ManipulationDescriptionInterface $description)
+    {
+        return new static();
+    }
 
     /**
      * @param ImageBlobInterface $image

@@ -2,6 +2,7 @@
 namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
 
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Point;
 
 /**

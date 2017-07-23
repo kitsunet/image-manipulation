@@ -24,7 +24,7 @@ class ResizeAdjustmentConverter
      */
     public function getDescription()
     {
-        return new ComplexResizeDescription('complexResize', [
+        return new ComplexResizeDescription([
             'width' => $this->resizeAdjustment->getWidth(),
             'height' => $this->resizeAdjustment->getHeight(),
             'maximumWidth' => $this->resizeAdjustment->getMaximumWidth(),

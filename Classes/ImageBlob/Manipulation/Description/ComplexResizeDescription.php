@@ -3,6 +3,7 @@ namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
 
 use Kitsunet\ImageManipulation\ImageBlob\Box;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
+use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Point;
 
 /**
@@ -14,7 +15,7 @@ use Kitsunet\ImageManipulation\ImageBlob\Point;
  * - ratioMode
  * - allowUpscaling
  */
-class ComplexResizeDescription implements DecomposableInterface
+class ComplexResizeDescription implements ManipulationDescriptionInterface, DecomposableInterface
 {
     /**
      * @var array
@@ -50,11 +51,12 @@ class ComplexResizeDescription implements DecomposableInterface
     /**
      * Decompose complex operation into simple operations.
      *
-     * @param BoxInterface $imageSize
+     * @param ImageBlobInterface $imageBlob
      * @return ManipulationDescriptionInterface[]
      */
-    public function decompose(BoxInterface $imageSize)
+    public function decompose(ImageBlobInterface $imageBlob)
     {
+        $imageSize = $imageBlob->getSize();
         $ratioMode = $this->options['ratioMode'];
         if ($ratioMode !== ResizeManipulationDescription::RATIOMODE_INSET &&
             $ratioMode !== ResizeManipulationDescription::RATIOMODE_OUTBOUND

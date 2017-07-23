@@ -1,0 +1,11 @@
+Kitsunet:
+  ImageManipulation:
+    ImageBlob:
+      # Maps classnames of \Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface implementations
+      # to classnames of \Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface implementations
+      #
+      typeBasedManipulationMapping:
+        __fallback: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\PassthroughImageManipulation'
+        crop: '\Kitsunet\ImageManipulation\Imagine\CropManipulation'
+        resize: '\Kitsunet\ImageManipulation\Imagine\ResizeManipulation'
+        grayscale: '\Kitsunet\ImageManipulation\Imagine\GrayscaleManipulation'

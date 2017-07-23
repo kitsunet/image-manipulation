@@ -3,7 +3,7 @@ namespace Kitsunet\ImageManipulation\Imagine;
 
 use Imagine\Image\Box;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ResizeManipulationDescription;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 
 /**
@@ -64,10 +64,10 @@ class ResizeManipulation implements ImageManipulationInterface
     }
 
     /**
-     * @param ResizeManipulationDescription $description
+     * @param ManipulationDescriptionInterface $description
      * @return static
      */
-    public static function fromDescription(ResizeManipulationDescription $description)
+    public static function fromDescription(ManipulationDescriptionInterface $description)
     {
         $options = $description->getOptions();
         return new static($options['width'], $options['height']);

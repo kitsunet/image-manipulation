@@ -6,6 +6,7 @@ use Imagine\Imagick\Image;
 use Imagine\Imagick\Imagine;
 use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
+use Kitsunet\ImageManipulation\ImageBlob\DescriptionMappingService;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
@@ -54,6 +55,12 @@ class ImageService
     protected $settings;
 
     /**
+     * @Flow\Inject
+     * @var DescriptionMappingService
+     */
+    protected $descriptionMappingService;
+
+    /**
      * @param ImagineInterface $imagineService
      */
     public function injectImagineService(ImagineInterface $imagineService)
@@ -73,8 +80,7 @@ class ImageService
         $blobMetadata = $this->prepareMetadata($originalResource);
         $blob = ImagineImageBlob::fromStream($originalResource->getStream(), $blobMetadata);
 
-        $converter = new DescriptionToManipulationConverter($manipulationDescriptions, $blob);
-        $manipulations = $converter->getManipulationStack();
+        $manipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($manipulationDescriptions, $blob);
         return $this->process($blob, $manipulations);
     }
 
