@@ -45,6 +45,23 @@ class Point
     }
 
     /**
+     * @param Box $rectangle
+     * @return bool
+     */
+    public function in(Box $rectangle)
+    {
+        if ($this->x > $rectangle->getWidth()) {
+            return false;
+        }
+
+        if ($this->y > $rectangle->getHeight()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @return array
      */
     public function toArray()
