@@ -4,7 +4,7 @@ namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
 /**
  *
  */
-class GenericManipulationDescription implements ManipulationDescriptionInterface
+class GenericDescription implements ManipulationDescriptionInterface
 {
     /**
      * @var string
@@ -17,7 +17,7 @@ class GenericManipulationDescription implements ManipulationDescriptionInterface
     protected $options;
 
     /**
-     * GenericManipulationDescription constructor.
+     * GenericDescription constructor.
      *
      * @param string $type
      * @param array $options

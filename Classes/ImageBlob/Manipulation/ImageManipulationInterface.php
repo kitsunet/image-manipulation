@@ -9,11 +9,6 @@ use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDe
  */
 interface ImageManipulationInterface
 {
-    const TYPE_PASSTHROUGH = 'passthrough';
-    const TYPE_CROP = 'crop';
-    const TYPE_RESIZE = 'resize';
-    const TYPE_GRAYSCALE = 'grayscale';
-
     /**
      *  Take the given image and returns *a new*
      *  image with the manipulation added to it.

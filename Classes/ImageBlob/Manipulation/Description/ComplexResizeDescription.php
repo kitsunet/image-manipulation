@@ -18,12 +18,24 @@ use Kitsunet\ImageManipulation\ImageBlob\Point;
 class ComplexResizeDescription implements ManipulationDescriptionInterface, DecomposableInterface
 {
     /**
+     * Inset ratio mode: If an image is attempted to get scaled with the size of both edges stated, using this mode will scale it to the lower of both edges.
+     * Consider an image of 320/480 being scaled to 50/50: because aspect ratio wouldn't get hurt, the target image size will become 33/50.
+     */
+    const RATIOMODE_INSET = 'inset';
+
+    /**
+     * Outbound ratio mode: If an image is attempted to get scaled with the size of both edges stated, using this mode will scale the image and crop it.
+     * Consider an image of 320/480 being scaled to 50/50: the image will be scaled to height 50, then centered and cropped so the width will also be 50.
+     */
+    const RATIOMODE_OUTBOUND = 'outbound';
+
+    /**
      * @var array
      */
     protected $options;
 
     /**
-     * GenericManipulationDescription constructor.
+     * GenericDescription constructor.
      *
      * @param array $options
      */
@@ -58,23 +70,23 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
     {
         $imageSize = $imageBlob->getSize();
         $ratioMode = $this->options['ratioMode'];
-        if ($ratioMode !== ResizeManipulationDescription::RATIOMODE_INSET &&
-            $ratioMode !== ResizeManipulationDescription::RATIOMODE_OUTBOUND
+        if ($ratioMode !== static::RATIOMODE_INSET &&
+            $ratioMode !== static::RATIOMODE_OUTBOUND
         ) {
             throw new \InvalidArgumentException('Invalid mode specified');
         }
 
         $requestedDimensions = $this->calculateDimensions($imageSize);
         $resizeDimensions = $requestedDimensions;
-        if ($ratioMode === ResizeManipulationDescription::RATIOMODE_OUTBOUND) {
+        if ($ratioMode === static::RATIOMODE_OUTBOUND) {
             $resizeDimensions = $this->calculateOutboundScalingDimensions($imageSize, $requestedDimensions);
         }
 
         $manipulationDescriptions = [];
-        $manipulationDescriptions[] = ResizeManipulationDescription::toDimensions($resizeDimensions);
+        $manipulationDescriptions[] = ResizeDescription::toDimensions($resizeDimensions);
 
-        if ($ratioMode === ResizeManipulationDescription::RATIOMODE_OUTBOUND) {
-            $manipulationDescriptions[] = CropManipulationDescription::withFocusAndSize(
+        if ($ratioMode === static::RATIOMODE_OUTBOUND) {
+            $manipulationDescriptions[] = CropDescription::withFocusAndSize(
                 new Point(
                     max(0, round(($resizeDimensions->getWidth() - $requestedDimensions->getWidth()) / 2)),
                     max(0, round(($resizeDimensions->getHeight() - $requestedDimensions->getHeight()) / 2))
@@ -137,9 +149,9 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      */
     protected function calculateWithFixedDimensions(BoxInterface $originalDimensions, $requestedWidth, $requestedHeight)
     {
-        $ratioMode = $this->options['ratioMode'] ?: ResizeManipulationDescription::RATIOMODE_INSET;
+        $ratioMode = $this->options['ratioMode'] ?: static::RATIOMODE_INSET;
 
-        if ($ratioMode === ResizeManipulationDescription::RATIOMODE_OUTBOUND) {
+        if ($ratioMode === static::RATIOMODE_OUTBOUND) {
             return $this->calculateOutboundBox($originalDimensions, $requestedWidth, $requestedHeight);
         }
 

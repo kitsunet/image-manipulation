@@ -1,5 +1,11 @@
 Kitsunet\ImageManipulation\Imagine\ImageService:
   properties:
+    imageOptions:
+      # TODO: In the PR this should be overriden by the Media package to the media options for b/c
+      setting: Kitsunet.ImageManipulation.Imagine.imageOptions
+
+Kitsunet\ImageManipulation\ImageBlob\ImageSizes:
+  properties:
     imageSizeCache:
       object:
         factoryObjectName: Neos\Flow\Cache\CacheManager
@@ -7,3 +13,10 @@ Kitsunet\ImageManipulation\Imagine\ImageService:
         arguments:
           1:
             value: Neos_Media_ImageSize
+
+Kitsunet\ImageManipulation\ImageBlob\ImageManipulator:
+  properties:
+    preDescriptions:
+      setting: Kitsunet.ImageManipulation.ImageBlob.preDescriptions
+    postDescriptions:
+      setting: Kitsunet.ImageManipulation.ImageBlob.postDescriptions

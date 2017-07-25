@@ -1,5 +1,5 @@
 <?php
-namespace Kitsunet\ImageManipulation\Imagine;
+namespace Kitsunet\ImageManipulation\ImageBlob;
 
 /**
  *

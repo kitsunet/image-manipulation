@@ -9,3 +9,17 @@ Kitsunet:
         crop: '\Kitsunet\ImageManipulation\Imagine\CropManipulation'
         resize: '\Kitsunet\ImageManipulation\Imagine\ResizeManipulation'
         grayscale: '\Kitsunet\ImageManipulation\Imagine\GrayscaleManipulation'
+        passthrough: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\PassthroughImageManipulation'
+      preDescriptions: []
+      postDescriptions:
+        greyscale:
+          class: \Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\GenericDescription
+          arguments:
+            - 'grayscale'
+            - []
+
+    Imagine:
+      imageOptions:
+        quality: 90
+        convertCMYKToRGB: true
+        resizeFilter: '%\Imagine\Image\ImageInterface::FILTER_UNDEFINED%'

@@ -18,7 +18,7 @@ class Box implements BoxInterface
     private $height;
 
     /**
-     * Constructs the Size with given width and height
+     * Constructs the Box with given width and height
      *
      * @param int $width
      * @param integer $height
@@ -37,7 +37,7 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     public function getWidth()
     {
@@ -45,7 +45,7 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     public function getHeight()
     {
@@ -53,7 +53,8 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param float $ratio
+     * @return static
      */
     public function scale($ratio)
     {
@@ -61,7 +62,8 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param int $size
+     * @return static
      */
     public function increase($size)
     {
@@ -69,9 +71,11 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param BoxInterface $box
+     * @param Point|null $start
+     * @return bool
      */
-    public function contains(Box $box, Point $start = null)
+    public function contains(BoxInterface $box, Point $start = null)
     {
         $start = $start ? $start : new Point(0, 0);
 
@@ -79,9 +83,9 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
-    public function square()
+    public function area()
     {
         return $this->width * $this->height;
     }
@@ -106,7 +110,8 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param float $width
+     * @return Box
      */
     public function widen($width)
     {
@@ -114,7 +119,8 @@ class Box implements BoxInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param float $height
+     * @return Box
      */
     public function heighten($height)
     {

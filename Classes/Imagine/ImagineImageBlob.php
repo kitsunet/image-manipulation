@@ -85,11 +85,11 @@ class ImagineImageBlob implements ImageBlobInterface
      */
     public function getStream()
     {
-        return static::getStreamInternal($this->imagineImage, $this->blobMetadata);
+        return $this->getStreamInternal();
     }
 
     /**
-     * @return Box|BoxInterface
+     * @return BoxInterface|Box
      */
     public function getSize()
     {
@@ -98,16 +98,14 @@ class ImagineImageBlob implements ImageBlobInterface
     }
 
     /**
-     * @param ImageInterface $imagineImage
-     * @param BlobMetadata $blobMetadata
      * @return resource
      */
-    protected static function getStreamInternal(ImageInterface $imagineImage, BlobMetadata $blobMetadata)
+    protected function getStreamInternal()
     {
-        $file = static::getTemporaryFilename($imagineImage, $blobMetadata);
+        $file = $this->getTemporaryFilename();
         if (!file_exists($file)) {
-            $webOptimization = new WebOptimization($file,($blobMetadata->getProperty('options') ?? []));
-            $webOptimization->apply($imagineImage);
+            $webOptimization = new WebOptimization($file, ($this->blobMetadata->getProperty('options') ?? []));
+            $webOptimization->apply($this->imagineImage);
         }
         $temp = fopen($file, 'r');
         return $temp;
@@ -116,14 +114,12 @@ class ImagineImageBlob implements ImageBlobInterface
     /**
      * Generate a temporary filename unique to this instance
      *
-     * @param ImageInterface $imagineImage
-     * @param BlobMetadata $blobMetadata
      * @return string
      */
-    protected static function getTemporaryFilename(ImageInterface $imagineImage, BlobMetadata $blobMetadata)
+    protected function getTemporaryFilename()
     {
-        $extension = '.' . $blobMetadata->getProperty('fileExtension') ?? 'png';
-        return FLOW_PATH_TEMPORARY . 'imagineblob_temporary_' . getmypid() . '_' . spl_object_hash($imagineImage) . $extension;
+        $extension = '.' . $this->blobMetadata->getProperty('fileExtension') ?? 'png';
+        return FLOW_PATH_TEMPORARY . 'imagineblob_temporary_' . getmypid() . '_' . spl_object_hash($this->imagineImage) . $extension;
     }
 
     /**
@@ -131,7 +127,7 @@ class ImagineImageBlob implements ImageBlobInterface
      */
     public function __destruct()
     {
-        $filename = static::getTemporaryFilename($this->imagineImage, $this->blobMetadata);
+        $filename = $this->getTemporaryFilename();
         @unlink($filename);
     }
 }

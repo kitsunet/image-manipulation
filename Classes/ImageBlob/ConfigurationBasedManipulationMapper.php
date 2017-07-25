@@ -5,9 +5,9 @@ use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\DecomposableIn
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 
 /**
- *
+ * A simple mapper using a configuation of description type => manipulation class name mappings.
  */
-class ConfigurationBasedDescriptionMapper
+class ConfigurationBasedManipulationMapper
 {
     /**
      * @var ManipulationDescriptionInterface[]
@@ -30,7 +30,7 @@ class ConfigurationBasedDescriptionMapper
         $this->descriptionStack = $descriptionStack;
 
         if (!isset($configuration['__fallback'])) {
-            throw new \InvalidArgumentException('To use the ConfigurationBasedDescriptionMapper you must at least specify a "__fallback" mapping for any unkown descriptions.'. 1500823224884);
+            throw new \InvalidArgumentException('To use the ConfigurationBasedManipulationMapper you must at least specify a "__fallback" mapping for any unkown descriptions.'. 1500823224884);
         }
 
         $this->configuration = $configuration;

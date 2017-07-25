@@ -6,20 +6,17 @@ use Imagine\Imagick\Image;
 use Imagine\Imagick\Imagine;
 use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
-use Kitsunet\ImageManipulation\ImageBlob\DescriptionMappingService;
+use Kitsunet\ImageManipulation\ImageBlob\DescriptionMappingServiceInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
+use Kitsunet\ImageManipulation\ImageBlob\ImageManipulator;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Kitsunet\ImageManipulation\ImageBlob\PassthroughImageManipulation;
-use Neos\Cache\Frontend\VariableFrontend;
 use Neos\Flow\ResourceManagement\Exception;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Configuration\Exception\InvalidConfigurationException;
 use Neos\Flow\ResourceManagement\PersistentResource;
-use Neos\Flow\ResourceManagement\ResourceManager;
-use Neos\Flow\Utility\Environment;
 use Neos\Utility\Arrays;
-use Neos\Utility\Unicode\Functions as UnicodeFunctions;
 
 /**
  * @Flow\Scope("singleton")
@@ -27,38 +24,26 @@ use Neos\Utility\Unicode\Functions as UnicodeFunctions;
 class ImageService
 {
     /**
+     * @Flow\Inject
+     * @var DescriptionMappingServiceInterface
+     */
+    protected $descriptionMappingService;
+
+    /**
      * @var ImagineInterface
      */
     protected $imagineService;
 
-    /**
-     * @var ResourceManager
-     * @Flow\Inject
-     */
-    protected $resourceManager;
 
     /**
-     * @Flow\Inject
-     * @var Environment
+     * @var ImageManipulator
      */
-    protected $environment;
+    protected $imageManipulator;
 
     /**
-     * @var VariableFrontend
-     */
-    protected $imageSizeCache;
-
-    /**
-     * @Flow\InjectConfiguration(package="Neos.Media")
      * @var array
      */
-    protected $settings;
-
-    /**
-     * @Flow\Inject
-     * @var DescriptionMappingService
-     */
-    protected $descriptionMappingService;
+    protected $imageOptions = [];
 
     /**
      * @param ImagineInterface $imagineService
@@ -66,6 +51,22 @@ class ImageService
     public function injectImagineService(ImagineInterface $imagineService)
     {
         $this->imagineService = $imagineService;
+    }
+
+    /**
+     * @param ImageManipulator $imageManipulator
+     */
+    public function injectImageManipulator(ImageManipulator $imageManipulator)
+    {
+        $this->imageManipulator = $imageManipulator;
+    }
+
+    /**
+     * @param array $imageOptions
+     */
+    public function injectImageOptions(array $imageOptions)
+    {
+        $this->imageOptions = $imageOptions;
     }
 
     /**
@@ -77,11 +78,13 @@ class ImageService
      */
     public function processImage(PersistentResource $originalResource, array $manipulationDescriptions)
     {
-        $blobMetadata = $this->prepareMetadata($originalResource);
+        $blobMetadata = $this->imageManipulator->prepareMetadata(['options' => $this->getOptionsMergedWithDefaults()], $originalResource);
         $blob = ImagineImageBlob::fromStream($originalResource->getStream(), $blobMetadata);
 
         $manipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($manipulationDescriptions, $blob);
-        return $this->process($blob, $manipulations);
+        $newImageBlob =  $this->process($blob, $manipulations);
+        $newResource = $this->imageManipulator->storeImageBlob($blob);
+        return $this->prepareReturnValue($newResource, $newImageBlob->getSize());
     }
 
     /**
@@ -93,18 +96,17 @@ class ImageService
     {
         // TODO: Special handling for SVG should be refactored at a later point.
         if ($blob->getMetadata()->getProperty('mediaType') === 'image/svg+xml') {
-            $newResource = $this->storeModifiedImageBlob($blob);
-            return $this->prepareReturnValue($newResource, $blob->getSize());
+            return $blob;
         }
 
         if ($this->shouldHandleAnimatedGif($blob)) {
             $blob = $this->processAnimatedGif($blob, $manipulations);
         } else {
-            $blob = $this->applyManipulationsToBlob($blob, $manipulations);
+            $manipulations = $this->imageManipulator->wrapManipulations($blob, $manipulations);
+            $blob = $this->imageManipulator->applyManipulationsToBlob($blob, $manipulations);
         }
 
-        $resource = $this->storeModifiedImageBlob($blob);
-        return $this->prepareReturnValue($resource, $blob->getSize());
+        return $blob;
     }
 
     /**
@@ -148,7 +150,8 @@ class ImageService
         foreach ($layers as $index => $imagineFrame) {
             $layerBlob = ImagineImageBlob::fromImagineImage($imagineFrame, $metadata);
             /** @var ImagineImageBlob $layerBlob */
-            $layerBlob = $this->applyManipulationsToBlob($layerBlob, $manipulations);
+            $wrappedManipulations = $this->imageManipulator->wrapManipulations($layerBlob, $manipulations);
+            $layerBlob = $this->imageManipulator->applyManipulationsToBlob($layerBlob, $wrappedManipulations);
             $newLayers[] = $layerBlob->getImagineImage();
         }
 
@@ -167,89 +170,13 @@ class ImageService
     }
 
     /**
-     * @param PersistentResource $originalResource
-     * @return BlobMetadata
-     */
-    protected function prepareMetadata(PersistentResource $originalResource)
-    {
-        return new BlobMetadata([
-            'collection' => $originalResource->getCollectionName(),
-            'filename' => $originalResource->getFilename(),
-            'mediaType' => $originalResource->getMediaType(),
-            'fileExtension' => $originalResource->getFileExtension(),
-            'options' => $this->getOptionsMergedWithDefaults()
-        ]);
-    }
-
-    /**
-     * @param PersistentResource $resource
-     * @param BoxInterface $imageSize
-     * @return array
-     */
-    protected function prepareReturnValue(PersistentResource $resource, BoxInterface $imageSize)
-    {
-        // todo: Refactor caching of image sizes...
-        $this->imageSizeCache->set($resource->getCacheEntryIdentifier(), [
-            'width' => $imageSize->getWidth(),
-            'height' => $imageSize->getHeight()
-        ]);
-
-        return [
-            'width' => $imageSize->getWidth(),
-            'height' => $imageSize->getHeight(),
-            'resource' => $resource
-        ];
-    }
-
-    /**
-     * @param ImageBlobInterface $blob
-     * @return PersistentResource
-     * @throws ImageFileException
-     */
-    protected function storeModifiedImageBlob(ImageBlobInterface $blob)
-    {
-        $resource = $this->resourceManager->importResource($blob->getStream(), $blob->getMetadata()->getProperty('collection'));
-        if ($resource === false) {
-            throw new ImageFileException('An error occurred while importing a generated image file as a resource.', 1413562208);
-        }
-
-        $imageSize = $blob->getSize();
-        $pathInfo = UnicodeFunctions::pathinfo($blob->getMetadata()->getProperty('filename'));
-        $resource->setFilename(sprintf('%s-%ux%u.%s', $pathInfo['filename'], $imageSize->getWidth(), $imageSize->getHeight(), $pathInfo['extension']));
-
-        return $resource;
-    }
-
-    /**
-     * @param ImageBlobInterface $blob
-     * @param ImageManipulationInterface[] $manipulations
-     * @return ImageBlobInterface
-     */
-    protected function applyManipulationsToBlob(ImageBlobInterface $blob, array $manipulations)
-    {
-        /** @var ImageBlobInterface $blob */
-        $blob = array_reduce($manipulations, function (ImageBlobInterface $blob, ImageManipulationInterface $manipulation) {
-            return $manipulation->applyTo($blob);
-        }, $blob);
-
-        $manipulation = new GrayscaleManipulation();
-        return $manipulation->applyTo($blob);
-    }
-
-    /**
      * @param array $additionalOptions
      * @return array
      * @throws InvalidConfigurationException
      */
     protected function getOptionsMergedWithDefaults(array $additionalOptions = [])
     {
-        $defaultOptions = Arrays::getValueByPath($this->settings, 'image.defaultOptions');
-        if (!is_array($defaultOptions)) {
-            $defaultOptions = [];
-        }
-        if ($additionalOptions !== []) {
-            $defaultOptions = Arrays::arrayMergeRecursiveOverrule($defaultOptions, $additionalOptions);
-        }
+        $defaultOptions = Arrays::arrayMergeRecursiveOverrule($this->imageOptions, $additionalOptions);
         $quality = isset($defaultOptions['quality']) ? (integer)$defaultOptions['quality'] : 90;
         if ($quality < 0 || $quality > 100) {
             throw new InvalidConfigurationException(
@@ -265,38 +192,18 @@ class ImageService
     }
 
     /**
-     * Get the size of a Flow PersistentResource that contains an image file.
+     * Prepare an array to return.
      *
      * @param PersistentResource $resource
+     * @param BoxInterface $imageSize
      * @return array
      */
-    public function getImageSize(PersistentResource $resource)
+    protected function prepareReturnValue(PersistentResource $resource, BoxInterface $imageSize)
     {
-        $cacheIdentifier = $resource->getCacheEntryIdentifier();
-
-        $imageSize = $this->imageSizeCache->get($cacheIdentifier);
-        if ($imageSize === false) {
-            $imageSize = $this->calculateImageSize($resource->getStream());
-            $this->imageSizeCache->set($cacheIdentifier, $imageSize);
-        }
-
-        return $imageSize;
-    }
-
-    /**
-     * @param resource $stream
-     * @return array
-     * @throws ImageFileException
-     */
-    protected function calculateImageSize($stream)
-    {
-        try {
-            $imagineImage = $this->imagineService->read($stream);
-            $sizeBox = $imagineImage->getSize();
-            $imageSize = ['width' => $sizeBox->getWidth(), 'height' => $sizeBox->getHeight()];
-        } catch (\Exception $e) {
-            throw new ImageFileException(sprintf('The given resource was not an image file your choosen driver can open. The original error was: %s', $e->getMessage()), 1336662898, $e);
-        }
-        return $imageSize;
+        return [
+            'width' => $imageSize->getWidth(),
+            'height' => $imageSize->getHeight(),
+            'resource' => $resource
+        ];
     }
 }

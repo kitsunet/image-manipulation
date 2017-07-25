@@ -7,7 +7,7 @@ use Neos\Flow\Annotations as Flow;
 /**
  * @Flow\Scope("singleton")
  */
-class DescriptionMappingService
+class DescriptionMappingService implements DescriptionMappingServiceInterface
 {
     /**
      * @Flow\InjectConfiguration(package="Kitsunet.ImageManipulation.ImageBlob", path="typeBasedManipulationMapping")
@@ -22,7 +22,7 @@ class DescriptionMappingService
      */
     public function mapDescriptionsToManipulations(array $descriptionStack, ImageBlobInterface $imageBlob)
     {
-        $mapper = new ConfigurationBasedDescriptionMapper($descriptionStack, $this->mappingConfiguration);
+        $mapper = new ConfigurationBasedManipulationMapper($descriptionStack, $this->mappingConfiguration);
         return $mapper->getManipulationStackFor($imageBlob);
     }
 }

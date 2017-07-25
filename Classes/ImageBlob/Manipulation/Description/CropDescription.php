@@ -2,7 +2,6 @@
 namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
 
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Point;
 
 /**
@@ -11,7 +10,7 @@ use Kitsunet\ImageManipulation\ImageBlob\Point;
  * top left corner and width and height as dimensions of the resulting
  * cropped image.
  */
-class CropManipulationDescription implements ManipulationDescriptionInterface
+class CropDescription implements ManipulationDescriptionInterface
 {
     /**
      * @var array
@@ -19,7 +18,7 @@ class CropManipulationDescription implements ManipulationDescriptionInterface
     protected $options;
 
     /**
-     * CropManipulationDescription constructor.
+     * CropDescription constructor.
      *
      * @param array $options
      */
@@ -33,7 +32,7 @@ class CropManipulationDescription implements ManipulationDescriptionInterface
      */
     public function getType()
     {
-        return ImageManipulationInterface::TYPE_CROP;
+        return ManipulationDescriptionInterface::TYPE_CROP;
     }
 
     /**

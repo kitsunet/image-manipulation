@@ -2,8 +2,8 @@
 namespace Kitsunet\ImageManipulation\Media;
 
 use Kitsunet\ImageManipulation\ImageBlob\Box;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\CropManipulationDescription;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\GenericManipulationDescription;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\CropDescription;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\GenericDescription;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Point;
 use Neos\Flow\Annotations as Flow;
@@ -37,13 +37,13 @@ class ManipulationDescriptionFactory
                 return $converter->getDescription();
                 break;
             case CropImageAdjustment::class:
-                return CropManipulationDescription::withFocusAndSize(
+                return CropDescription::withFocusAndSize(
                     new Point($adjustment->getX(), $adjustment->getY()),
                     new Box($adjustment->getWidth(), $adjustment->getHeight())
                 );
                 break;
             default:
-                return new GenericManipulationDescription('passthrough', []);
+                return new GenericDescription('passthrough', []);
         }
     }
 }
