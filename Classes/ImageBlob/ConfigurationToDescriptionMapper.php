@@ -1,6 +1,8 @@
 <?php
 namespace Kitsunet\ImageManipulation\ImageBlob;
 
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
+
 /**
  *
  */
@@ -8,9 +10,9 @@ abstract class ConfigurationToDescriptionMapper
 {
     /**
      * @param array $descriptionConfiguration
-     * @return array
+     * @return ManipulationDescriptionInterface[]
      */
-    public static function mapDescriptionConfiguration(array $descriptionConfiguration)
+    public static function mapDescriptionConfiguration(array $descriptionConfiguration): array
     {
         $descriptionConfiguration = array_filter($descriptionConfiguration, function ($item) {
             if ($item === null) {
@@ -30,13 +32,13 @@ abstract class ConfigurationToDescriptionMapper
     }
 
     /**
-     * @param $className
-     * @param $arguments
-     * @return mixed
+     * @param string $className
+     * @param array $arguments
+     * @return ManipulationDescriptionInterface
      *
      * @TODO: Shameless copy from Flow ObjectManager, should probably become static method in ObjectHandling.
      */
-    protected function instantiateClass($className, $arguments)
+    protected static function instantiateClass(string $className, array $arguments): ManipulationDescriptionInterface
     {
         switch (count($arguments)) {
             case 0:

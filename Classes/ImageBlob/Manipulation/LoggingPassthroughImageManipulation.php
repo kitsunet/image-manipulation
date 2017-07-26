@@ -12,7 +12,6 @@ use Neos\Flow\Log\SystemLoggerInterface;
 class LoggingPassthroughImageManipulation implements ImageManipulationInterface
 {
     /**
-     * @Flow\Inject
      * @var SystemLoggerInterface
      */
     protected $systemLogger;
@@ -22,16 +21,29 @@ class LoggingPassthroughImageManipulation implements ImageManipulationInterface
      */
     protected $description;
 
+    /**
+     * LoggingPassthroughImageManipulation constructor.
+     *
+     * @param ManipulationDescriptionInterface $description
+     */
     public function __construct(ManipulationDescriptionInterface $description)
     {
         $this->description = $description;
     }
 
     /**
+     * @param SystemLoggerInterface $systemLogger
+     */
+    public function injectSystemLogger(SystemLoggerInterface $systemLogger)
+    {
+        $this->systemLogger = $systemLogger;
+    }
+
+    /**
      * @param ManipulationDescriptionInterface $description
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description)
+    public static function fromDescription(ManipulationDescriptionInterface $description): LoggingPassthroughImageManipulation
     {
         return new static();
     }

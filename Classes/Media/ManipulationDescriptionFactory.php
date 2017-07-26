@@ -20,7 +20,7 @@ class ManipulationDescriptionFactory
      * @param ImageAdjustmentInterface[] $adjustments
      * @return ManipulationDescriptionInterface[]
      */
-    public function convertAdjustments(array $adjustments)
+    public function convertAdjustments(array $adjustments): array
     {
         return array_map([$this, 'convertAdjustment'], $adjustments);
     }
@@ -29,7 +29,7 @@ class ManipulationDescriptionFactory
      * @param ImageAdjustmentInterface $adjustment
      * @return ManipulationDescriptionInterface
      */
-    public function convertAdjustment(ImageAdjustmentInterface $adjustment)
+    public function convertAdjustment(ImageAdjustmentInterface $adjustment): ManipulationDescriptionInterface
     {
         switch (get_class($adjustment)) {
             case ResizeImageAdjustment::class:

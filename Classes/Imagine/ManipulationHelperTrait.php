@@ -3,13 +3,19 @@ namespace Kitsunet\ImageManipulation\Imagine;
 
 use Imagine\Image\ImageInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Neos\Imagine\ImagineFactory;
+use Neos\Flow\Annotations as Flow;
 
 /**
  *
  */
 trait ManipulationHelperTrait
 {
+    /**
+     * @Flow\Inject
+     * @var \Neos\Imagine\ImagineFactory
+     */
+    protected $_imagineFactory;
+
     /**
      * @param ImageBlobInterface $image
      * @return ImageInterface
@@ -20,9 +26,7 @@ trait ManipulationHelperTrait
             return $image->getImagineImage();
         }
 
-        $factory = new ImagineFactory();
-        $imagine = $factory->create();
-
+        $imagine = $this->_imagineFactory->create();
         return $imagine->read($image->getStream());
     }
 }

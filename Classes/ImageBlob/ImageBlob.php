@@ -35,7 +35,7 @@ class ImageBlob implements ImageBlobInterface
      * @param BlobMetadata $blobMetadata
      * @return static
      */
-    public static function fromStream($stream, BlobMetadata $blobMetadata)
+    public static function fromStream($stream, BlobMetadata $blobMetadata): self
     {
         return new static($stream, $blobMetadata);
     }
@@ -51,7 +51,7 @@ class ImageBlob implements ImageBlobInterface
     /**
      * @return EmptyBox
      */
-    public function getSize()
+    public function getSize(): BoxInterface
     {
         return new EmptyBox();
     }

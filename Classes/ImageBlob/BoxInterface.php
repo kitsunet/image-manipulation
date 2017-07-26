@@ -10,12 +10,12 @@ interface BoxInterface
     /**
      * @return int
      */
-    public function getWidth();
+    public function getWidth(): int;
 
     /**
      * @return int
      */
-    public function getHeight();
+    public function getHeight(): int;
 
     /**
      * Multiplies the size by given ratio and returns a new box.
@@ -23,7 +23,7 @@ interface BoxInterface
      * @param float $ratio
      * @return BoxInterface
      */
-    public function scale($ratio);
+    public function scale(float $ratio): self;
 
     /**
      * Adds the given size to width and height and returns a new box.
@@ -31,7 +31,7 @@ interface BoxInterface
      * @param int $size
      * @return static
      */
-    public function increase($size);
+    public function increase(int $size): self;
 
     /**
      * Is the given box inside this one?
@@ -41,14 +41,14 @@ interface BoxInterface
      * @param Point $start
      * @return bool
      */
-    public function contains(BoxInterface $box, Point $start = null);
+    public function contains(BoxInterface $box, Point $start = null): bool;
 
     /**
      * The area of this box.
      *
      * @return int
      */
-    public function area();
+    public function area(): int;
 
     /**
      * Proportionally widen the box by this ratio.
@@ -56,7 +56,7 @@ interface BoxInterface
      * @param float $width
      * @return static
      */
-    public function widen($width);
+    public function widen(float $width): self;
 
     /**
      * Proportionally heighten the box by this ratio.
@@ -64,10 +64,10 @@ interface BoxInterface
      * @param float $height
      * @return static
      */
-    public function heighten($height);
+    public function heighten(float $height): self;
 
     /**
      * @return array with "width" and "height" keys
      */
-    public function toArray();
+    public function toArray(): array;
 }

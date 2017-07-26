@@ -47,7 +47,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return 'complexResize';
     }
@@ -55,7 +55,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -66,7 +66,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      * @param ImageBlobInterface $imageBlob
      * @return ManipulationDescriptionInterface[]
      */
-    public function decompose(ImageBlobInterface $imageBlob)
+    public function decompose(ImageBlobInterface $imageBlob): array
     {
         $imageSize = $imageBlob->getSize();
         $ratioMode = $this->options['ratioMode'];
@@ -105,7 +105,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      * @param BoxInterface $originalDimensions Dimensions of the unadjusted image
      * @return BoxInterface
      */
-    protected function calculateDimensions(BoxInterface $originalDimensions)
+    protected function calculateDimensions(BoxInterface $originalDimensions): BoxInterface
     {
         /** @var BoxInterface $newDimensions */
         $newDimensions = clone $originalDimensions;
@@ -147,7 +147,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      * @param int $requestedHeight
      * @return BoxInterface
      */
-    protected function calculateWithFixedDimensions(BoxInterface $originalDimensions, $requestedWidth, $requestedHeight)
+    protected function calculateWithFixedDimensions(BoxInterface $originalDimensions, int $requestedWidth, int $requestedHeight): BoxInterface
     {
         $ratioMode = $this->options['ratioMode'] ?: static::RATIOMODE_INSET;
 
@@ -181,7 +181,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      * @param int $requestedHeight
      * @return BoxInterface
      */
-    protected function calculateOutboundBox(BoxInterface $originalDimensions, $requestedWidth, $requestedHeight)
+    protected function calculateOutboundBox(BoxInterface $originalDimensions, int $requestedWidth, int $requestedHeight): BoxInterface
     {
         $newDimensions = new Box($requestedWidth, $requestedHeight);
 
@@ -208,7 +208,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      * @param int $requestedWidth
      * @return BoxInterface
      */
-    protected function calculateScalingToWidth(BoxInterface $originalDimensions, $requestedWidth)
+    protected function calculateScalingToWidth(BoxInterface $originalDimensions, int $requestedWidth): BoxInterface
     {
         if ($this->options['allowUpscaling'] === false && $requestedWidth >= $originalDimensions->getWidth()) {
             return $originalDimensions;
@@ -227,7 +227,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      * @param int $requestedHeight
      * @return BoxInterface
      */
-    protected function calculateScalingToHeight(BoxInterface $originalDimensions, $requestedHeight)
+    protected function calculateScalingToHeight(BoxInterface $originalDimensions, int $requestedHeight): BoxInterface
     {
         if ($this->options['allowUpscaling'] === false && $requestedHeight >= $originalDimensions->getHeight()) {
             return $originalDimensions;
@@ -247,7 +247,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      * @param BoxInterface $requestedDimensions
      * @return BoxInterface
      */
-    protected function calculateOutboundScalingDimensions(BoxInterface $imageSize, BoxInterface $requestedDimensions)
+    protected function calculateOutboundScalingDimensions(BoxInterface $imageSize, BoxInterface $requestedDimensions): BoxInterface
     {
         $ratios = [
             $requestedDimensions->getWidth() / $imageSize->getWidth(),

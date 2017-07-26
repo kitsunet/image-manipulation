@@ -33,7 +33,7 @@ class ResizeDescription implements ManipulationDescriptionInterface
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return ManipulationDescriptionInterface::TYPE_RESIZE;
     }
@@ -41,7 +41,7 @@ class ResizeDescription implements ManipulationDescriptionInterface
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -50,7 +50,7 @@ class ResizeDescription implements ManipulationDescriptionInterface
      * @param int $width
      * @return static
      */
-    public static function toWidth(int $width)
+    public static function toWidth(int $width): ResizeDescription
     {
         return new static($width);
     }
@@ -59,7 +59,7 @@ class ResizeDescription implements ManipulationDescriptionInterface
      * @param int $height
      * @return static
      */
-    public static function toHeight(int $height)
+    public static function toHeight(int $height): ResizeDescription
     {
         return new static(null, $height);
     }
@@ -68,7 +68,7 @@ class ResizeDescription implements ManipulationDescriptionInterface
      * @param BoxInterface $dimensions
      * @return static
      */
-    public static function toDimensions(BoxInterface $dimensions)
+    public static function toDimensions(BoxInterface $dimensions): ResizeDescription
     {
         return new static($dimensions->getWidth(), $dimensions->getHeight());
     }

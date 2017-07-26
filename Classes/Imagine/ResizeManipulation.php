@@ -39,7 +39,7 @@ class ResizeManipulation implements ImageManipulationInterface
      * @param int $width
      * @return static
      */
-    public static function toWidth(int $width)
+    public static function toWidth(int $width): self
     {
         return new static($width);
     }
@@ -48,7 +48,7 @@ class ResizeManipulation implements ImageManipulationInterface
      * @param int $height
      * @return static
      */
-    public static function toHeight(int $height)
+    public static function toHeight(int $height): self
     {
         return new static(null, $height);
     }
@@ -58,7 +58,7 @@ class ResizeManipulation implements ImageManipulationInterface
      * @param int $height
      * @return static
      */
-    public static function toDimensions(int $width, int $height)
+    public static function toDimensions(int $width, int $height): self
     {
         return new static($width, $height);
     }
@@ -67,7 +67,7 @@ class ResizeManipulation implements ImageManipulationInterface
      * @param ManipulationDescriptionInterface $description
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description)
+    public static function fromDescription(ManipulationDescriptionInterface $description): self
     {
         $options = $description->getOptions();
         return new static($options['width'], $options['height']);

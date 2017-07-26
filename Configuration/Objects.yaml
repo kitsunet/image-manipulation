@@ -20,3 +20,7 @@ Kitsunet\ImageManipulation\ImageBlob\ImageManipulator:
       setting: Kitsunet.ImageManipulation.ImageBlob.preDescriptions
     postDescriptions:
       setting: Kitsunet.ImageManipulation.ImageBlob.postDescriptions
+
+Kitsunet\ImageManipulation\ImageBlob\ImageBlobFactoryInterface:
+  className: Kitsunet\ImageManipulation\Imagine\ImageBlobFactory
+  scope: singleton

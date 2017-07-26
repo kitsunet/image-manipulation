@@ -1,6 +1,7 @@
 <?php
 namespace Kitsunet\ImageManipulation\ImageBlob;
 
+use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ResourceManagement\PersistentResource;
 
@@ -15,10 +16,16 @@ class ImageSizes
     protected $imageSizeCache;
 
     /**
-     * @param PersistentResource $resource
-     * @return mixed
+     * @Flow\Inject
+     * @var ImageBlobFactoryInterface
      */
-    public function getSizeForResource(PersistentResource $resource)
+    protected $imageBlobFactory;
+
+    /**
+     * @param PersistentResource $resource
+     * @return array
+     */
+    public function getSizeForResource(PersistentResource $resource): array
     {
         $cacheIdentifier = $resource->getCacheEntryIdentifier();
 
@@ -48,11 +55,11 @@ class ImageSizes
      * @return array
      * @throws ImageFileException
      */
-    protected function calculateImageSize($stream)
+    protected function calculateImageSize($stream): array
     {
         try {
-            $imagineImage = $this->imagineService->read($stream);
-            $sizeBox = $imagineImage->getSize();
+            $blob = $this->imageBlobFactory->create($stream, new BlobMetadata([]));
+            $sizeBox = $blob->getSize();
             $imageSize = ['width' => $sizeBox->getWidth(), 'height' => $sizeBox->getHeight()];
         } catch (\Exception $e) {
             throw new ImageFileException(sprintf('The given resource was not an image file your choosen driver can open. The original error was: %s', $e->getMessage()), 1336662898, $e);

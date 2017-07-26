@@ -65,7 +65,7 @@ class ImageManipulator
      * @param PersistentResource $originalResource
      * @return BlobMetadata
      */
-    public function prepareMetadata(array $initialMetadata, PersistentResource $originalResource)
+    public function prepareMetadata(array $initialMetadata, PersistentResource $originalResource): BlobMetadata
     {
         $metadataArray = array_merge($initialMetadata, [
             'collection' => $originalResource->getCollectionName(),
@@ -85,7 +85,7 @@ class ImageManipulator
      * @return PersistentResource
      * @throws ImageFileException
      */
-    public function storeImageBlob(ImageBlobInterface $blob, $filename = null, $collectionName = null)
+    public function storeImageBlob(ImageBlobInterface $blob, string $filename = null, string $collectionName = null): PersistentResource
     {
         $collectionName = $collectionName ?? $blob->getMetadata()->getProperty('collection');
         $resource = $this->resourceManager->importResource($blob->getStream(), $collectionName);
@@ -107,7 +107,7 @@ class ImageManipulator
      * @param ImageManipulationInterface[] $manipulations
      * @return ImageManipulationInterface[]
      */
-    public function wrapManipulations(ImageBlobInterface $imageBlob, array $manipulations)
+    public function wrapManipulations(ImageBlobInterface $imageBlob, array $manipulations): array
     {
         $preManipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($this->preDescriptions, $imageBlob);
         $postManipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($this->postDescriptions, $imageBlob);
@@ -121,7 +121,7 @@ class ImageManipulator
      * @param ImageManipulationInterface[] $manipulations
      * @return ImageBlobInterface
      */
-    public function applyManipulationsToBlob(ImageBlobInterface $blob, array $manipulations)
+    public function applyManipulationsToBlob(ImageBlobInterface $blob, array $manipulations): ImageBlobInterface
     {
         /** @var ImageBlobInterface $blob */
         return array_reduce($manipulations, function (ImageBlobInterface $blob, ImageManipulationInterface $manipulation) {

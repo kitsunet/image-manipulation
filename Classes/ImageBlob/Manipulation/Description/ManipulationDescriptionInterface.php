@@ -22,10 +22,10 @@ interface ManipulationDescriptionInterface
     /**
      * @return string
      */
-    public function getType();
+    public function getType(): string;
 
     /**
      * @return array
      */
-    public function getOptions();
+    public function getOptions(): array;
 }

@@ -12,5 +12,5 @@ interface ImageBlobInterface extends BlobInterface
     /**
      * @return BoxInterface
      */
-    public function getSize();
+    public function getSize(): BoxInterface;
 }

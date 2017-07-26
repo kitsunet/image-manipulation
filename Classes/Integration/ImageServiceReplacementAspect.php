@@ -1,6 +1,7 @@
 <?php
 namespace Kitsunet\ImageManipulation\Integration;
 
+use Kitsunet\ImageManipulation\ImageBlob\ImageSizes;
 use Kitsunet\ImageManipulation\Imagine\ImageService;
 use Kitsunet\ImageManipulation\Media\ManipulationDescriptionFactory;
 use Neos\Flow\Annotations as Flow;
@@ -20,6 +21,12 @@ class ImageServiceReplacementAspect
 
     /**
      * @Flow\Inject
+     * @var ImageSizes
+     */
+    protected $imageSizes;
+
+    /**
+     * @Flow\Inject
      * @var ManipulationDescriptionFactory
      */
     protected $manipulationDescriptionFactory;
@@ -36,5 +43,17 @@ class ImageServiceReplacementAspect
         $manipulationsDescriptions = $this->manipulationDescriptionFactory->convertAdjustments($arguments['adjustments']);
 
         return $this->imageService->processImage($arguments['originalResource'], $manipulationsDescriptions);
+    }
+
+    /**
+     * @param JoinPointInterface $joinPoint
+     * @return array
+     *
+     * @Flow\Around("method(Neos\Media\Domain\Service\ImageService->getImageSize())")
+     */
+    public function replaceGetImageSize(JoinPointInterface $joinPoint)
+    {
+        $arguments = $joinPoint->getMethodArguments();
+        return $this->imageSizes->getSizeForResource($arguments['resource']);
     }
 }

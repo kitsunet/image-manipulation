@@ -2,6 +2,7 @@
 namespace Kitsunet\ImageManipulation\ImageBlob;
 
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Neos\Flow\Annotations as Flow;
 
 /**
@@ -18,9 +19,9 @@ class DescriptionMappingService implements DescriptionMappingServiceInterface
     /**
      * @param ManipulationDescriptionInterface[] $descriptionStack
      * @param ImageBlobInterface $imageBlob
-     * @return array
+     * @return ImageManipulationInterface[]
      */
-    public function mapDescriptionsToManipulations(array $descriptionStack, ImageBlobInterface $imageBlob)
+    public function mapDescriptionsToManipulations(array $descriptionStack, ImageBlobInterface $imageBlob): array
     {
         $mapper = new ConfigurationBasedManipulationMapper($descriptionStack, $this->mappingConfiguration);
         return $mapper->getManipulationStackFor($imageBlob);

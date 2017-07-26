@@ -47,7 +47,7 @@ class ImagineImageBlob implements ImageBlobInterface
      * @param BlobMetadata $blobMetadata
      * @return static
      */
-    public static function fromStream($stream, BlobMetadata $blobMetadata)
+    public static function fromStream($stream, BlobMetadata $blobMetadata): ImagineImageBlob
     {
         $factory = new ImagineFactory();
         $imagine = $factory->create();
@@ -59,7 +59,7 @@ class ImagineImageBlob implements ImageBlobInterface
      * @param BlobMetadata $blobMetadata
      * @return static
      */
-    public static function fromImagineImage(ImageInterface $imagineImage, BlobMetadata $blobMetadata)
+    public static function fromImagineImage(ImageInterface $imagineImage, BlobMetadata $blobMetadata): ImagineImageBlob
     {
         return new static($imagineImage, $blobMetadata);
     }
@@ -91,7 +91,7 @@ class ImagineImageBlob implements ImageBlobInterface
     /**
      * @return BoxInterface|Box
      */
-    public function getSize()
+    public function getSize(): BoxInterface
     {
         $imagineBox = $this->imagineImage->getSize();
         return new Box($imagineBox->getWidth(), $imagineBox->getHeight());
@@ -116,7 +116,7 @@ class ImagineImageBlob implements ImageBlobInterface
      *
      * @return string
      */
-    protected function getTemporaryFilename()
+    protected function getTemporaryFilename(): string
     {
         $extension = '.' . $this->blobMetadata->getProperty('fileExtension') ?? 'png';
         return FLOW_PATH_TEMPORARY . 'imagineblob_temporary_' . getmypid() . '_' . spl_object_hash($this->imagineImage) . $extension;

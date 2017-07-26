@@ -28,12 +28,12 @@ class GenericDescription implements ManipulationDescriptionInterface
         $this->options = $options;
     }
 
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }

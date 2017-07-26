@@ -40,7 +40,7 @@ class ConfigurationBasedManipulationMapper
      * @param ImageBlobInterface $imageBlob
      * @return array
      */
-    public function getManipulationStackFor(ImageBlobInterface $imageBlob)
+    public function getManipulationStackFor(ImageBlobInterface $imageBlob): array
     {
         return $this->convertDescriptionsToManipulations($this->descriptionStack, $imageBlob);
     }
@@ -50,7 +50,7 @@ class ConfigurationBasedManipulationMapper
      * @param ImageBlobInterface $imageBlob
      * @return array
      */
-    protected function convertDescriptionsToManipulations(array $descriptionStack, ImageBlobInterface $imageBlob)
+    protected function convertDescriptionsToManipulations(array $descriptionStack, ImageBlobInterface $imageBlob): array
     {
         return array_reduce($descriptionStack, function (array $manipulations, ManipulationDescriptionInterface $description) use ($imageBlob) {
             $manipulations = array_merge($manipulations, $this->convertDescriptionToManipulations($description, $imageBlob));
@@ -64,7 +64,7 @@ class ConfigurationBasedManipulationMapper
      * @param ImageBlobInterface $imageBlob
      * @return array
      */
-    protected function convertDescriptionToManipulations(ManipulationDescriptionInterface $description, ImageBlobInterface $imageBlob)
+    protected function convertDescriptionToManipulations(ManipulationDescriptionInterface $description, ImageBlobInterface $imageBlob): array
     {
         if (isset($this->configuration[$description->getType()])) {
             $manipulationClassname = $this->configuration[$description->getType()];

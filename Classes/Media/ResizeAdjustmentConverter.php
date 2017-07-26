@@ -20,9 +20,9 @@ class ResizeAdjustmentConverter
     }
 
     /**
-     * @return array
+     * @return ComplexResizeDescription
      */
-    public function getDescription()
+    public function getDescription(): ComplexResizeDescription
     {
         return new ComplexResizeDescription([
             'width' => $this->resizeAdjustment->getWidth(),

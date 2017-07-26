@@ -16,7 +16,7 @@ class GrayscaleManipulation implements ImageManipulationInterface
      * @param ManipulationDescriptionInterface $description
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description)
+    public static function fromDescription(ManipulationDescriptionInterface $description): self
     {
         return new static();
     }

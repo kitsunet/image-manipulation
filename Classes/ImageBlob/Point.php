@@ -31,7 +31,7 @@ class Point
     /**
      * @return int
      */
-    public function getX()
+    public function getX(): int
     {
         return $this->x;
     }
@@ -39,16 +39,16 @@ class Point
     /**
      * @return int
      */
-    public function getY()
+    public function getY(): int
     {
         return $this->y;
     }
 
     /**
-     * @param Box $rectangle
+     * @param BoxInterface $rectangle
      * @return bool
      */
-    public function in(Box $rectangle)
+    public function in(BoxInterface $rectangle): bool
     {
         if ($this->x > $rectangle->getWidth()) {
             return false;
@@ -64,7 +64,7 @@ class Point
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'x' => $this->getX(),

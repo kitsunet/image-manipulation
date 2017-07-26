@@ -9,7 +9,7 @@ class PassthroughDescription implements ManipulationDescriptionInterface
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return ManipulationDescriptionInterface::TYPE_PASSTHROUGH;
     }
@@ -17,7 +17,7 @@ class PassthroughDescription implements ManipulationDescriptionInterface
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return [];
     }

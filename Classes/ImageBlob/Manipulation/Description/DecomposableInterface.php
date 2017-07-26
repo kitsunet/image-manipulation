@@ -17,5 +17,5 @@ interface DecomposableInterface
      * @param ImageBlobInterface $imageBlob
      * @return ManipulationDescriptionInterface[]
      */
-    public function decompose(ImageBlobInterface $imageBlob);
+    public function decompose(ImageBlobInterface $imageBlob): array;
 }

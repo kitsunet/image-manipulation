@@ -16,7 +16,7 @@ class EmptyBox implements BoxInterface
     /**
      * @return int
      */
-    public function getWidth()
+    public function getWidth(): int
     {
         return 0;
     }
@@ -24,25 +24,25 @@ class EmptyBox implements BoxInterface
     /**
      * @return int
      */
-    public function getHeight()
+    public function getHeight(): int
     {
         return 0;
     }
 
     /**
-     * @param int $ratio
+     * @param float $ratio
      * @return EmptyBox
      */
-    public function scale($ratio)
+    public function scale(float $ratio): BoxInterface
     {
         return new EmptyBox();
     }
 
     /**
      * @param int $size
-     * @return Box
+     * @return BoxInterface
      */
-    public function increase($size)
+    public function increase(int $size): BoxInterface
     {
         return new Box($size, $size);
     }
@@ -52,7 +52,7 @@ class EmptyBox implements BoxInterface
      * @param Point|null $start
      * @return bool
      */
-    public function contains(BoxInterface $box, Point $start = null)
+    public function contains(BoxInterface $box, Point $start = null): bool
     {
         return false;
     }
@@ -60,7 +60,7 @@ class EmptyBox implements BoxInterface
     /**
      * @return int
      */
-    public function area()
+    public function area(): int
     {
         return 0;
     }
@@ -68,7 +68,7 @@ class EmptyBox implements BoxInterface
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return 'empty box';
     }
@@ -76,7 +76,7 @@ class EmptyBox implements BoxInterface
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'width' => $this->getWidth(),
@@ -85,19 +85,19 @@ class EmptyBox implements BoxInterface
     }
 
     /**
-     * @param int $width
+     * @param float $width
      * @return EmptyBox
      */
-    public function widen($width)
+    public function widen(float $width): BoxInterface
     {
         return new EmptyBox();
     }
 
     /**
-     * @param int $height
+     * @param float $height
      * @return EmptyBox
      */
-    public function heighten($height)
+    public function heighten(float $height): BoxInterface
     {
         return new EmptyBox();
     }

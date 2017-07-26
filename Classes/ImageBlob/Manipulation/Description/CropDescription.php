@@ -30,7 +30,7 @@ class CropDescription implements ManipulationDescriptionInterface
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return ManipulationDescriptionInterface::TYPE_CROP;
     }
@@ -38,7 +38,7 @@ class CropDescription implements ManipulationDescriptionInterface
     /**
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -48,7 +48,7 @@ class CropDescription implements ManipulationDescriptionInterface
      * @param BoxInterface $size
      * @return static
      */
-    public static function withFocusAndSize(Point $focusPoint, BoxInterface $size)
+    public static function withFocusAndSize(Point $focusPoint, BoxInterface $size): CropDescription
     {
         return new static(array_merge($focusPoint->toArray(), $size->toArray()));
     }
