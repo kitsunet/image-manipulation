@@ -5,6 +5,7 @@ use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 
 /**
  * Describes a resize manipulation.
+ *
  * If either width or height is 0 it means this
  * resize is proportionally scaling to the given dimension.
  * With both dimensions given you might get a skewed image.

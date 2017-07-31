@@ -5,7 +5,7 @@ use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 
 /**
- * Describes an image manipulation.
+ * An image manipulation returning a new image blob.
  */
 interface ImageManipulationInterface
 {

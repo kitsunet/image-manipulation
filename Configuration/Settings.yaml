@@ -10,10 +10,15 @@ Kitsunet:
         resize: '\Kitsunet\ImageManipulation\Imagine\ResizeManipulation'
         grayscale: '\Kitsunet\ImageManipulation\Imagine\GrayscaleManipulation'
         passthrough: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\PassthroughImageManipulation'
+        rotate: '\Kitsunet\ImageManipulation\Imagine\RotateManipulation'
       preDescriptions: []
       postDescriptions:
-        greyscale:
-          class: \Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\GenericDescription
+#        rotate:
+#          class: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\RotateDescription'
+#          arguments:
+#            - 180
+        grayscale:
+          class: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\GenericDescription'
           arguments:
             - 'grayscale'
             - []

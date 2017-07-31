@@ -2,7 +2,7 @@
 namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
 
 /**
- *
+ * Describes a passthrough manipulation that does nothing.
  */
 class PassthroughDescription implements ManipulationDescriptionInterface
 {

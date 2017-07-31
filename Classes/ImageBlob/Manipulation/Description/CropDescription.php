@@ -44,6 +44,8 @@ class CropDescription implements ManipulationDescriptionInterface
     }
 
     /**
+     * Creates a crop description with a center point and a size.
+     *
      * @param Point $focusPoint
      * @param BoxInterface $size
      * @return static

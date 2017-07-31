@@ -9,6 +9,8 @@ use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 interface ImageBlobFactoryInterface
 {
     /**
+     * Create Imageblob from the given stream and metadata.
+     *
      * @param resource $stream
      * @param BlobMetadata $blobMetadata
      * @return ImageBlobInterface

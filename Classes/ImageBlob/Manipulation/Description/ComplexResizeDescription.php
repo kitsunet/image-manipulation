@@ -7,6 +7,7 @@ use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Point;
 
 /**
+ *  Receives the following options:
  *
  * - width
  * - height
@@ -69,7 +70,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
     public function decompose(ImageBlobInterface $imageBlob): array
     {
         $imageSize = $imageBlob->getSize();
-        $ratioMode = $this->options['ratioMode'];
+        $ratioMode = $this->options['ratioMode'] ?: static::RATIOMODE_INSET;
         if ($ratioMode !== static::RATIOMODE_INSET &&
             $ratioMode !== static::RATIOMODE_OUTBOUND
         ) {

@@ -8,6 +8,7 @@ use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Kitsunet\ImageManipulation\ImageBlob\Box;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
+use Kitsunet\ImageManipulation\ImageBlob\TemporaryFileFromStreamTrait;
 use Neos\Imagine\ImagineFactory;
 
 /**
@@ -15,6 +16,8 @@ use Neos\Imagine\ImagineFactory;
  */
 class ImagineImageBlob implements ImageBlobInterface
 {
+    use TemporaryFileFromStreamTrait;
+
     /**
      * @var resource
      */
@@ -102,32 +105,13 @@ class ImagineImageBlob implements ImageBlobInterface
      */
     protected function getStreamInternal()
     {
-        $file = $this->getTemporaryFilename();
+        $fileExtension = $this->blobMetadata->getProperty('fileExtension') ?? 'png';
+        $file = $this->getTemporaryFilename($fileExtension);
         if (!file_exists($file)) {
             $webOptimization = new WebOptimization($file, ($this->blobMetadata->getProperty('options') ?? []));
             $webOptimization->apply($this->imagineImage);
         }
         $temp = fopen($file, 'r');
         return $temp;
-    }
-
-    /**
-     * Generate a temporary filename unique to this instance
-     *
-     * @return string
-     */
-    protected function getTemporaryFilename(): string
-    {
-        $extension = '.' . $this->blobMetadata->getProperty('fileExtension') ?? 'png';
-        return FLOW_PATH_TEMPORARY . 'imagineblob_temporary_' . getmypid() . '_' . spl_object_hash($this->imagineImage) . $extension;
-    }
-
-    /**
-     * removes any leftover temporary files
-     */
-    public function __destruct()
-    {
-        $filename = $this->getTemporaryFilename();
-        @unlink($filename);
     }
 }

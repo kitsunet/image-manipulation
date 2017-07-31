@@ -31,7 +31,7 @@ class EmptyBox implements BoxInterface
 
     /**
      * @param float $ratio
-     * @return EmptyBox
+     * @return BoxInterface
      */
     public function scale(float $ratio): BoxInterface
     {
@@ -86,7 +86,7 @@ class EmptyBox implements BoxInterface
 
     /**
      * @param float $width
-     * @return EmptyBox
+     * @return BoxInterface
      */
     public function widen(float $width): BoxInterface
     {
@@ -95,7 +95,7 @@ class EmptyBox implements BoxInterface
 
     /**
      * @param float $height
-     * @return EmptyBox
+     * @return BoxInterface
      */
     public function heighten(float $height): BoxInterface
     {

@@ -2,7 +2,7 @@
 namespace Kitsunet\ImageManipulation\Blob;
 
 /**
- *
+ * A simple metadata container to accompany blobs.
  */
 class BlobMetadata
 {

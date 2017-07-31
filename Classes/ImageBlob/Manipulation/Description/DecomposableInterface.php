@@ -10,7 +10,8 @@ use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 interface DecomposableInterface
 {
     /**
-     * This will be called on a decomposable descritption by any mapper.
+     * This will be called on a decomposable description by any mapper.
+     *
      * It should return an array of \Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface
      * that can then be turned into actual operations.
      *

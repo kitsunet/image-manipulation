@@ -8,7 +8,7 @@ use Neos\Flow\ResourceManagement\ResourceManager;
 use Neos\Utility\Unicode\Functions as UnicodeFunctions;
 
 /**
- *
+ * Basic functionality to deal with creation, manipulation and storing of PersistentResources in the context of Imageblobs.
  */
 class ImageManipulator
 {

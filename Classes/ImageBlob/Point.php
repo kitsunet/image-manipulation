@@ -2,7 +2,7 @@
 namespace Kitsunet\ImageManipulation\ImageBlob;
 
 /**
- *
+ * Definition of a geometrical point which is very useful for (pixel-based) images.
  */
 class Point
 {
@@ -62,6 +62,8 @@ class Point
     }
 
     /**
+     * Returns an array with "x" and "y" keys.
+     *
      * @return array
      */
     public function toArray(): array

@@ -1,14 +1,22 @@
 <?php
 namespace Kitsunet\ImageManipulation\Blob;
 
+/**
+ * Contract for a generic blob of data and metadata.
+ *
+ */
 interface BlobInterface
 {
     /**
+     * Get a stream resource for this blob
+     *
      * @return resource
      */
     public function getStream();
 
     /**
+     * Get the metadata for this blob.
+     *
      * @return BlobMetadata
      */
     public function getMetadata(): BlobMetadata;

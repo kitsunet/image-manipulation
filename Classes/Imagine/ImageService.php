@@ -2,16 +2,16 @@
 namespace Kitsunet\ImageManipulation\Imagine;
 
 use Imagine\Image\ImagineInterface;
-use Imagine\Imagick\Image;
-use Imagine\Imagick\Imagine;
 use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 use Kitsunet\ImageManipulation\ImageBlob\DescriptionMappingServiceInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageManipulator;
+use Kitsunet\ImageManipulation\ImageBlob\ImageServiceInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Kitsunet\ImageManipulation\ImageBlob\PassthroughImageManipulation;
+use Kitsunet\ImageManipulation\ImageBlob\ResourceProcessorInterface;
 use Neos\Flow\ResourceManagement\Exception;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Configuration\Exception\InvalidConfigurationException;
@@ -21,7 +21,7 @@ use Neos\Utility\Arrays;
 /**
  * @Flow\Scope("singleton")
  */
-class ImageService
+class ImageService implements ImageServiceInterface, ResourceProcessorInterface
 {
     /**
      * @Flow\Inject
@@ -76,23 +76,33 @@ class ImageService
      * @throws InvalidConfigurationException
      * @throws Exception
      */
-    public function processImage(PersistentResource $originalResource, array $manipulationDescriptions)
+    public function processResource(PersistentResource $originalResource, array $manipulationDescriptions)
     {
         $blobMetadata = $this->imageManipulator->prepareMetadata(['options' => $this->getOptionsMergedWithDefaults()], $originalResource);
         $blob = ImagineImageBlob::fromStream($originalResource->getStream(), $blobMetadata);
 
-        $manipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($manipulationDescriptions, $blob);
-        $newImageBlob =  $this->process($blob, $manipulations);
+        $newImageBlob =  $this->process($blob, $manipulationDescriptions);
         $newResource = $this->imageManipulator->storeImageBlob($blob);
         return $this->prepareReturnValue($newResource, $newImageBlob->getSize());
     }
 
     /**
      * @param ImageBlobInterface $blob
-     * @param ImageManipulationInterface[] $manipulations
-     * @return array resource, width, height as keys
+     * @param ManipulationDescriptionInterface[] $manipulationDescriptions
+     * @return ImageBlobInterface
      */
-    public function process(ImageBlobInterface $blob, array $manipulations)
+    public function process(ImageBlobInterface $blob, array $manipulationDescriptions)
+    {
+        $manipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($manipulationDescriptions, $blob);
+        return $this->manipulate($blob, $manipulations);
+    }
+
+    /**
+     * @param ImageBlobInterface $blob
+     * @param ImageManipulationInterface[] $manipulations
+     * @return ImageBlobInterface|ImagineImageBlob
+     */
+    public function manipulate(ImageBlobInterface $blob, array $manipulations)
     {
         // TODO: Special handling for SVG should be refactored at a later point.
         if ($blob->getMetadata()->getProperty('mediaType') === 'image/svg+xml') {
@@ -115,11 +125,11 @@ class ImageService
      */
     protected function shouldHandleAnimatedGif(ImagineImageBlob $blob)
     {
-        if (!$this->imagineService instanceof Imagine) {
+        if (!$this->imagineService instanceof \Imagine\Imagick\Imagine) {
             return false;
         }
 
-        /** @var Image $imagineImage */
+        /** @var \Imagine\Imagick\Image $imagineImage */
         $imagineImage = $blob->getImagineImage();
         $imagick = $imagineImage->getImagick();
 
@@ -141,7 +151,7 @@ class ImageService
      */
     protected function processAnimatedGif(ImagineImageBlob $blob, array $manipulations)
     {
-        /** @var Image $imagineImage */
+        /** @var \Imagine\Imagick\Image $imagineImage */
         $imagineImage = $blob->getImagineImage();
         $metadata = $blob->getMetadata();
         $layers = $imagineImage->layers();

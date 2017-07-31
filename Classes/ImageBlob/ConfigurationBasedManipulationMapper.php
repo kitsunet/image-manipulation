@@ -15,14 +15,16 @@ class ConfigurationBasedManipulationMapper
     protected $descriptionStack;
 
     /**
+     * The mapping mappingConfiguration.
+     *
      * @var array
      */
-    protected $configuration;
+    protected $mappingConfiguration;
 
     /**
      * Converts descriptions to manipulations based on a preconfigured mapping.
      *
-     * @param ManipulationDescriptionInterface[] $descriptionStack the
+     * @param ManipulationDescriptionInterface[] $descriptionStack The descriptions that are to be converted.
      * @param array $configuration A map "ManipulationDescriptionInterface implementation classname" => "ImageManipulationInterface implementation classname"
      */
     public function __construct(array $descriptionStack, array $configuration)
@@ -30,13 +32,15 @@ class ConfigurationBasedManipulationMapper
         $this->descriptionStack = $descriptionStack;
 
         if (!isset($configuration['__fallback'])) {
-            throw new \InvalidArgumentException('To use the ConfigurationBasedManipulationMapper you must at least specify a "__fallback" mapping for any unkown descriptions.'. 1500823224884);
+            throw new \InvalidArgumentException('To use the ConfigurationBasedManipulationMapper you must at least specify a "__fallback" mapping for any unknown descriptions.'. 1500823224884);
         }
 
-        $this->configuration = $configuration;
+        $this->mappingConfiguration = $configuration;
     }
 
     /**
+     * Get a stack of manipulations for the given ImageBlob and the descriptions bound to this instance.
+     *
      * @param ImageBlobInterface $imageBlob
      * @return array
      */
@@ -46,6 +50,8 @@ class ConfigurationBasedManipulationMapper
     }
 
     /**
+     * Implements the reduce logic that converts descriptions to manipulations.
+     *
      * @param ManipulationDescriptionInterface[] $descriptionStack
      * @param ImageBlobInterface $imageBlob
      * @return array
@@ -60,14 +66,16 @@ class ConfigurationBasedManipulationMapper
     }
 
     /**
+     * Convert a single description to an array of manipulations.
+     *
      * @param ManipulationDescriptionInterface $description
      * @param ImageBlobInterface $imageBlob
      * @return array
      */
     protected function convertDescriptionToManipulations(ManipulationDescriptionInterface $description, ImageBlobInterface $imageBlob): array
     {
-        if (isset($this->configuration[$description->getType()])) {
-            $manipulationClassname = $this->configuration[$description->getType()];
+        if (isset($this->mappingConfiguration[$description->getType()])) {
+            $manipulationClassname = $this->mappingConfiguration[$description->getType()];
             return [$manipulationClassname::fromDescription($description)];
         }
 
@@ -76,7 +84,7 @@ class ConfigurationBasedManipulationMapper
             return $this->convertDescriptionsToManipulations($manipulationDescriptions, $imageBlob);
         }
 
-        $manipulationClassname = $this->configuration['__fallback'];
+        $manipulationClassname = $this->mappingConfiguration['__fallback'];
         return [$manipulationClassname::fromDescription($description)];
     }
 }

@@ -7,7 +7,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Log\SystemLoggerInterface;
 
 /**
- *
+ * A operation that just passes through the incoming imageblob and logs the call.
  */
 class LoggingPassthroughImageManipulation implements ImageManipulationInterface
 {

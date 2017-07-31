@@ -4,10 +4,12 @@ namespace Kitsunet\ImageManipulation\ImageBlob;
 use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 
 /**
- * This placeholder implementation should never be used and is most probably removed later on.
+ * This is a generic ImageBlob implementation to be used as fallback and reference.
  */
 class ImageBlob implements ImageBlobInterface
 {
+    use TemporaryFileFromStreamTrait;
+
     /**
      * @var resource
      */
@@ -20,6 +22,8 @@ class ImageBlob implements ImageBlobInterface
 
     /**
      * ImageBlob constructor.
+     *
+     * @see \Kitsunet\ImageManipulation\ImageBlob\ImageBlobFactoryInterface
      *
      * @param $stream
      * @param BlobMetadata $blobMetadata
@@ -49,11 +53,22 @@ class ImageBlob implements ImageBlobInterface
     }
 
     /**
-     * @return EmptyBox
+     * @return BoxInterface
      */
     public function getSize(): BoxInterface
     {
-        return new EmptyBox();
+        $fileExtension = $this->blobMetadata->getProperty('fileExtension') ?? 'png';
+        $temporaryFilename = $this->getTemporaryFilename($fileExtension);
+        $temporaryFile = fopen($temporaryFilename, 'w');
+        stream_copy_to_stream($this->stream, $temporaryFile);
+        fclose($temporaryFile);
+
+        try {
+            list($width, $height) = getimagesize($temporaryFilename);
+            return new Box($width, $height);
+        } catch (\Exception $exception) {
+            return new EmptyBox();
+        }
     }
 
     /**
