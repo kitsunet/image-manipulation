@@ -2,7 +2,6 @@
 namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation;
 
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 
 /**
  * An image manipulation returning a new image blob.
@@ -19,9 +18,9 @@ interface ImageManipulationInterface
     public function applyTo(ImageBlobInterface $image): ImageBlobInterface;
 
     /**
-     * @param ManipulationDescriptionInterface $description
-     * @return mixed
+     * @param array $options
+     * @return static
      * @throws \InvalidArgumentException If description cannot be used to create this manipulation.
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description);
+    public static function fromOptions(array $options);
 }

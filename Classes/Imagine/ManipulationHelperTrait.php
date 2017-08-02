@@ -12,21 +12,20 @@ trait ManipulationHelperTrait
 {
     /**
      * @Flow\Inject
-     * @var \Neos\Imagine\ImagineFactory
+     * @var ImageBlobFactory
      */
-    protected $_imagineFactory;
+    protected $_imagineBlobFactory;
 
     /**
      * @param ImageBlobInterface $image
-     * @return ImageInterface
+     * @return ImagineImageBlob
      */
-    protected function getImagineImage(ImageBlobInterface $image): ImageInterface
+    protected function upgradeToImagineBlob(ImageBlobInterface $image): ImagineImageBlob
     {
         if ($image instanceof ImagineImageBlob) {
-            return $image->getImagineImage();
+            return $image;
         }
 
-        $imagine = $this->_imagineFactory->create();
-        return $imagine->read($image->getStream());
+        $this->_imagineBlobFactory->create($image->getStream(), clone $image->getMetadata());
     }
 }

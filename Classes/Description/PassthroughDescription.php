@@ -1,5 +1,5 @@
 <?php
-namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
+namespace Kitsunet\ImageManipulation\Description;
 
 /**
  * Describes a passthrough manipulation that does nothing.

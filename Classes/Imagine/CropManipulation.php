@@ -3,8 +3,8 @@ namespace Kitsunet\ImageManipulation\Imagine;
 
 use Imagine\Image\Box;
 use Imagine\Image\Point;
+use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 
 /**
@@ -51,13 +51,22 @@ class CropManipulation implements ImageManipulationInterface
     }
 
     /**
-     * @param ManipulationDescriptionInterface $description
+     * @param array $options
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description)
+    public static function fromOptions(array $options)
     {
-        $options = $description->getOptions();
-        return new static($options['x'], $options['y'], $options['width'], $options['height']);
+        return new static((int)$options['x'], (int)$options['y'], (int)$options['width'], (int)$options['height']);
+    }
+
+    /**
+     * @param \Kitsunet\ImageManipulation\ImageBlob\Point $point
+     * @param BoxInterface $box
+     * @return static
+     */
+    public static function fromPointAndBox(\Kitsunet\ImageManipulation\ImageBlob\Point $point, BoxInterface $box)
+    {
+        return new static($point->getX(), $point->getY(), $box->getWidth(), $box->getHeight());
     }
 
     /**
@@ -66,8 +75,10 @@ class CropManipulation implements ImageManipulationInterface
      */
     public function applyTo(ImageBlobInterface $image): ImageBlobInterface
     {
-        $imagine = $this->getImagineImage($image);
+        $image = $this->upgradeToImagineBlob($image);
+
+        $imagine = $image->getImagineImage();
         $imagine = $imagine->crop(new Point($this->x, $this->y), new Box($this->width, $this->height));
-        return ImagineImageBlob::fromImagineImage($imagine, $image->getMetadata());
+        return ImagineImageBlob::fromImagineImage($imagine, clone $image->getMetadata());
     }
 }

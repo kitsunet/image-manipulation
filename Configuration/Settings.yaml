@@ -12,19 +12,23 @@ Kitsunet:
         passthrough: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\PassthroughImageManipulation'
         rotate: '\Kitsunet\ImageManipulation\Imagine\RotateManipulation'
       preDescriptions: []
-      postDescriptions:
-#        rotate:
-#          class: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\RotateDescription'
-#          arguments:
-#            - 180
-        grayscale:
-          class: '\Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\GenericDescription'
-          arguments:
-            - 'grayscale'
-            - []
+      postDescriptions: []
 
-    Imagine:
-      imageOptions:
-        quality: 90
-        convertCMYKToRGB: true
-        resizeFilter: '%\Imagine\Image\ImageInterface::FILTER_UNDEFINED%'
+      metadata:
+        defaultOptions:
+          imagine:
+            # 0-100 higher is better quality but bigger filesize
+            jpeg_quality: 90
+            # 0-9 lower is better quality but bigger filesize
+            png_compression_level: 0
+            convertCMYKToRGB: true
+            resizeFilter: '%\Imagine\Image\ImageInterface::FILTER_UNDEFINED%'
+
+Neos:
+  Media:
+    imageBlob:
+      adjustmentMapping:
+        'Neos\Media\Domain\Model\Adjustment\CropImageAdjustment':
+          class: 'Kitsunet\ImageManipulation\Imagine\CropManipulation'
+        'Neos\Media\Domain\Model\Adjustment\ResizeImageAdjustment':
+          class: 'Kitsunet\ImageManipulation\Imagine\ResizeCropManipulation'

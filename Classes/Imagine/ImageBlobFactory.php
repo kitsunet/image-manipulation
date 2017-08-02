@@ -4,6 +4,7 @@ namespace Kitsunet\ImageManipulation\Imagine;
 use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobFactoryInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
+use Neos\Imagine\ImagineFactory;
 
 /**
  *
@@ -17,7 +18,9 @@ class ImageBlobFactory implements ImageBlobFactoryInterface
      */
     public function create($stream, BlobMetadata $blobMetadata): ImageBlobInterface
     {
-        return ImagineImageBlob::fromStream($stream, $blobMetadata);
-    }
+        $factory = new ImagineFactory();
+        $imagine = $factory->create();
 
+        return new ImagineImageBlob($imagine->read($stream), $blobMetadata);
+    }
 }

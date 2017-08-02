@@ -1,7 +1,5 @@
 <?php
-namespace Kitsunet\ImageManipulation\ImageBlob;
-
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
+namespace Kitsunet\ImageManipulation\Description;
 
 /**
  *

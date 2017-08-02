@@ -1,102 +1,65 @@
 <?php
-namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
+namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation;
 
-use Kitsunet\ImageManipulation\ImageBlob\Box;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Point;
 
 /**
- *  Receives the following options:
  *
- * - width
- * - height
- * - maximumWidth
- * - maximumHeight
- * - ratioMode
- * - allowUpscaling
  */
-class ComplexResizeDescription implements ManipulationDescriptionInterface, DecomposableInterface
+trait ResizeCropManipulationHelperTrait
 {
-    /**
-     * Inset ratio mode: If an image is attempted to get scaled with the size of both edges stated, using this mode will scale it to the lower of both edges.
-     * Consider an image of 320/480 being scaled to 50/50: because aspect ratio wouldn't get hurt, the target image size will become 33/50.
-     */
-    const RATIOMODE_INSET = 'inset';
-
-    /**
-     * Outbound ratio mode: If an image is attempted to get scaled with the size of both edges stated, using this mode will scale the image and crop it.
-     * Consider an image of 320/480 being scaled to 50/50: the image will be scaled to height 50, then centered and cropped so the width will also be 50.
-     */
-    const RATIOMODE_OUTBOUND = 'outbound';
-
-    /**
-     * @var array
-     */
-    protected $options;
-
-    /**
-     * GenericDescription constructor.
-     *
-     * @param array $options
-     */
-    public function __construct(array $options)
-    {
-        $this->options = $options;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return 'complexResize';
-    }
-
-    /**
-     * @return array
-     */
-    public function getOptions(): array
-    {
-        return $this->options;
-    }
-
     /**
      * Decompose complex operation into simple operations.
      *
      * @param ImageBlobInterface $imageBlob
-     * @return ManipulationDescriptionInterface[]
+     * @return Manipulator
      */
-    public function decompose(ImageBlobInterface $imageBlob): array
+    protected function getSubManipulations(ImageBlobInterface $imageBlob): Manipulator
     {
         $imageSize = $imageBlob->getSize();
-        $ratioMode = $this->options['ratioMode'] ?: static::RATIOMODE_INSET;
-        if ($ratioMode !== static::RATIOMODE_INSET &&
-            $ratioMode !== static::RATIOMODE_OUTBOUND
+        $ratioMode = $this->options['ratioMode'] ?: ResizeCropManipulationInterface::RATIOMODE_INSET;
+        if ($ratioMode !== ResizeCropManipulationInterface::RATIOMODE_INSET &&
+            $ratioMode !== ResizeCropManipulationInterface::RATIOMODE_OUTBOUND
         ) {
-            throw new \InvalidArgumentException('Invalid mode specified');
+            throw new \InvalidArgumentException('Invalid mode specified', 1501684163544);
         }
 
         $requestedDimensions = $this->calculateDimensions($imageSize);
         $resizeDimensions = $requestedDimensions;
-        if ($ratioMode === static::RATIOMODE_OUTBOUND) {
+        if ($ratioMode === ResizeCropManipulationInterface::RATIOMODE_OUTBOUND) {
             $resizeDimensions = $this->calculateOutboundScalingDimensions($imageSize, $requestedDimensions);
         }
 
-        $manipulationDescriptions = [];
-        $manipulationDescriptions[] = ResizeDescription::toDimensions($resizeDimensions);
+        $manipulations = [];
+        $manipulations[] = $this->createResizeManipulation($resizeDimensions);
 
-        if ($ratioMode === static::RATIOMODE_OUTBOUND) {
-            $manipulationDescriptions[] = CropDescription::withFocusAndSize(
-                new Point(
-                    max(0, round(($resizeDimensions->getWidth() - $requestedDimensions->getWidth()) / 2)),
-                    max(0, round(($resizeDimensions->getHeight() - $requestedDimensions->getHeight()) / 2))
-                ),
-                $requestedDimensions
-            );
+        if ($ratioMode === ResizeCropManipulationInterface::RATIOMODE_OUTBOUND) {
+            $manipulations[] = $this->createCropManipulation(new Point(
+                max(0, round(($resizeDimensions->getWidth() - $requestedDimensions->getWidth()) / 2)),
+                max(0, round(($resizeDimensions->getHeight() - $requestedDimensions->getHeight()) / 2))
+            ), $requestedDimensions);
         }
 
-        return $manipulationDescriptions;
+        $manipulator = new Manipulator($manipulations);
+        return $manipulator;
+    }
+
+    /**
+     * Create the specific resize implementation based on the box representing width and height.
+     */
+    protected function createResizeManipulation(BoxInterface $resizeDimensions)
+    {
+        throw new \BadMethodCallException(sprintf('Users of this trait need to implement the "createResizeManipulation" method but "%s" does not.', get_class($this)), 1501685109418);
+    }
+
+    /**
+     * Create the specific crop implmentation based on a top left point and a box representing width and height.
+     */
+    protected function createCropManipulation(Point $point, BoxInterface $requestedDimensions)
+    {
+        throw new \BadMethodCallException(sprintf('Users of this trait need to implement the "createCropManipulation" method but "%s" does not.', get_class($this)), 1501685109418);
     }
 
     /**
@@ -150,7 +113,7 @@ class ComplexResizeDescription implements ManipulationDescriptionInterface, Deco
      */
     protected function calculateWithFixedDimensions(BoxInterface $originalDimensions, int $requestedWidth, int $requestedHeight): BoxInterface
     {
-        $ratioMode = $this->options['ratioMode'] ?: static::RATIOMODE_INSET;
+        $ratioMode = $this->options['ratioMode'] ?: ResizeCropManipulationInterface::RATIOMODE_INSET;
 
         if ($ratioMode === static::RATIOMODE_OUTBOUND) {
             return $this->calculateOutboundBox($originalDimensions, $requestedWidth, $requestedHeight);

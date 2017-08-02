@@ -7,43 +7,91 @@ namespace Kitsunet\ImageManipulation\Blob;
 class BlobMetadata
 {
     /**
+     * @var string
+     */
+    protected $filename;
+
+    /**
+     * @var string
+     */
+    protected $mediaType;
+
+    /**
      * @var array
      */
-    protected $properties;
+    protected $options;
 
     /**
      * BlobMetadata constructor.
      *
-     * @param array $properties
+     * @param string $filename
+     * @param string $mediaType
+     * @param array $options
      */
-    public function __construct(array $properties)
+    public function __construct(string $filename, string $mediaType, array $options)
     {
-        $this->properties = $properties;
+        $this->filename = $filename;
+        $this->mediaType = $mediaType;
+        $this->options = $options;
     }
 
     /**
-     * @param string $name
-     * @return bool
+     * @return string
      */
-    public function hasProperty($name)
+    public function getFilename(): string
     {
-        return array_key_exists($name, $this->properties);
+        return $this->filename;
     }
 
     /**
-     * @param string $name
-     * @return mixed|null
+     * @return string
      */
-    public function getProperty($name)
+    public function getMediaType(): string
     {
-        return $this->properties[$name] ?? null;
+        return $this->mediaType;
     }
 
     /**
      * @return array
      */
-    public function toArray()
+    public function getOptions(): array
     {
-        return $this->properties;
+        return $this->options;
+    }
+
+    /**
+     * @param string $namespace
+     * @return array
+     */
+    public function getOptionsInNamespace(string $namespace): array
+    {
+        return $this->options[$namespace] ?? [];
+    }
+
+    /**
+     * @param string $filename
+     * @return static
+     */
+    public function withFilename(string $filename)
+    {
+        return new static($filename, $this->mediaType, $this->options);
+    }
+
+    /**
+     * @param string $mediaType
+     * @return static
+     */
+    public function withMediaType(string $mediaType)
+    {
+        return new static($this->filename, $mediaType, $this->options);
+    }
+
+    /**
+     * @param array $options
+     * @return static
+     */
+    public function withOptions(array $options)
+    {
+        return new static($this->filename, $this->mediaType, $options);
     }
 }

@@ -10,6 +10,7 @@ use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\TemporaryFileFromStreamTrait;
 use Neos\Imagine\ImagineFactory;
+use Neos\Utility\MediaTypes;
 
 /**
  *
@@ -60,7 +61,7 @@ class ImagineImageBlob implements ImageBlobInterface
     /**
      * @param ImageInterface $imagineImage
      * @param BlobMetadata $blobMetadata
-     * @return static
+     * @return ImagineImageBlob
      */
     public static function fromImagineImage(ImageInterface $imagineImage, BlobMetadata $blobMetadata): ImagineImageBlob
     {
@@ -105,10 +106,10 @@ class ImagineImageBlob implements ImageBlobInterface
      */
     protected function getStreamInternal()
     {
-        $fileExtension = $this->blobMetadata->getProperty('fileExtension') ?? 'png';
+        $fileExtension = MediaTypes::getFilenameExtensionFromMediaType($this->blobMetadata->getMediaType());
         $file = $this->getTemporaryFilename($fileExtension);
         if (!file_exists($file)) {
-            $webOptimization = new WebOptimization($file, ($this->blobMetadata->getProperty('options') ?? []));
+            $webOptimization = new WebOptimization($file, $this->blobMetadata->getOptionsInNamespace('imagine'));
             $webOptimization->apply($this->imagineImage);
         }
         $temp = fopen($file, 'r');

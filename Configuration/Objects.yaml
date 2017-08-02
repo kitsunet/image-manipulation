@@ -1,9 +1,3 @@
-Kitsunet\ImageManipulation\Imagine\ImageService:
-  properties:
-    imageOptions:
-      # TODO: In the PR this should be overriden by the Media package to the media options for b/c
-      setting: Kitsunet.ImageManipulation.Imagine.imageOptions
-
 Kitsunet\ImageManipulation\ImageBlob\ImageSizes:
   properties:
     imageSizeCache:
@@ -24,3 +18,9 @@ Kitsunet\ImageManipulation\ImageBlob\ImageManipulator:
 Kitsunet\ImageManipulation\ImageBlob\ImageBlobFactoryInterface:
   className: Kitsunet\ImageManipulation\Imagine\ImageBlobFactory
   scope: singleton
+
+Kitsunet\ImageManipulation\ImageBlob\ImageServiceInterface:
+  className: Kitsunet\ImageManipulation\Imagine\ImageService
+
+Kitsunet\ImageManipulation\ImageBlob\ResourceProcessorInterface:
+  className: Kitsunet\ImageManipulation\Imagine\ImageService

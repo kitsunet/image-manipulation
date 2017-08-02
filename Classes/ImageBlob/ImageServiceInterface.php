@@ -1,6 +1,8 @@
 <?php
 namespace Kitsunet\ImageManipulation\ImageBlob;
 
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
+
 /**
  * Contract for a service to manipulate ImageBlobs.
  *
@@ -8,13 +10,6 @@ namespace Kitsunet\ImageManipulation\ImageBlob;
  */
 interface ImageServiceInterface
 {
-    /**
-     * @param ImageBlobInterface $blob
-     * @param ManipulationDescriptionInterface[] $manipulationDescriptions
-     * @return ImageBlobInterface
-     */
-    public function process(ImageBlobInterface $blob, array $manipulationDescriptions);
-
     /**
      * @param ImageBlobInterface $blob
      * @param ImageManipulationInterface[] $manipulations

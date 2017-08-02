@@ -2,7 +2,6 @@
 namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation;
 
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 
 /**
  * A "NULL" operation manipulation that does nothing and just passes the incoming imageblob.
@@ -10,10 +9,10 @@ use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDe
 class PassthroughImageManipulation implements ImageManipulationInterface
 {
     /**
-     * @param ManipulationDescriptionInterface $description
+     * @param array $options
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description)
+    public static function fromOptions(array $options)
     {
         return new static();
     }

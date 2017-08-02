@@ -1,5 +1,5 @@
 <?php
-namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
+namespace Kitsunet\ImageManipulation\Description;
 
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 

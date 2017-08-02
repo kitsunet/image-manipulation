@@ -1,8 +1,7 @@
 <?php
-namespace Kitsunet\ImageManipulation\ImageBlob;
+namespace Kitsunet\ImageManipulation\Description;
 
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\DecomposableInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
+use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 
 /**
  * A simple mapper using a configuation of description type => manipulation class name mappings.

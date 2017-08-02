@@ -1,9 +1,11 @@
 <?php
 namespace Kitsunet\ImageManipulation\Integration;
 
+use Kitsunet\ImageManipulation\ImageBlob\ImageBlobFactoryInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageServiceInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageSizes;
-use Kitsunet\ImageManipulation\Media\ManipulationDescriptionFactory;
+use Kitsunet\ImageManipulation\ImageBlob\ResourceProcessorInterface;
+use Kitsunet\ImageManipulation\Media\ManipulationFactory;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Aop\JoinPointInterface;
 
@@ -15,7 +17,7 @@ class ImageServiceReplacementAspect
 {
     /**
      * @Flow\Inject
-     * @var ImageServiceInterface
+     * @var ResourceProcessorInterface
      */
     protected $imageService;
 
@@ -27,9 +29,9 @@ class ImageServiceReplacementAspect
 
     /**
      * @Flow\Inject
-     * @var ManipulationDescriptionFactory
+     * @var ManipulationFactory
      */
-    protected $manipulationDescriptionFactory;
+    protected $manipulationFactory;
 
     /**
      * @param JoinPointInterface $joinPoint
@@ -40,9 +42,8 @@ class ImageServiceReplacementAspect
     public function replaceProcessImage(JoinPointInterface $joinPoint)
     {
         $arguments = $joinPoint->getMethodArguments();
-        $manipulationsDescriptions = $this->manipulationDescriptionFactory->convertAdjustments($arguments['adjustments']);
-
-        return $this->imageService->processResource($arguments['originalResource'], $manipulationsDescriptions);
+        $manipulations = $this->manipulationFactory->convertAdjustments($arguments['adjustments']);
+        return $this->imageService->processResource($arguments['originalResource'], $manipulations);
     }
 
     /**

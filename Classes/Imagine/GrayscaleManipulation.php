@@ -2,7 +2,6 @@
 namespace Kitsunet\ImageManipulation\Imagine;
 
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 
 /**
@@ -13,10 +12,10 @@ class GrayscaleManipulation implements ImageManipulationInterface
     use ManipulationHelperTrait;
 
     /**
-     * @param ManipulationDescriptionInterface $description
+     * @param array $options
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description): self
+    public static function fromOptions(array $options): self
     {
         return new static();
     }
@@ -27,7 +26,11 @@ class GrayscaleManipulation implements ImageManipulationInterface
      */
     public function applyTo(ImageBlobInterface $image): ImageBlobInterface
     {
-        $imagine = $this->getImagineImage($image);
+        if (!$image instanceof ImagineImageBlob) {
+            $image = $this->upgradeToImagineBlob($image);
+        }
+
+        $imagine = $image->getImagineImage();
         $imagine->effects()->grayscale();
         return ImagineImageBlob::fromImagineImage($imagine, $image->getMetadata());
     }

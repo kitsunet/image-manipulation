@@ -1,7 +1,7 @@
 <?php
-namespace Kitsunet\ImageManipulation\ImageBlob;
+namespace Kitsunet\ImageManipulation\Description;
 
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
+use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Neos\Flow\Annotations as Flow;
 

@@ -2,7 +2,6 @@
 namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation;
 
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Log\SystemLoggerInterface;
 
@@ -17,18 +16,18 @@ class LoggingPassthroughImageManipulation implements ImageManipulationInterface
     protected $systemLogger;
 
     /**
-     * @var ManipulationDescriptionInterface
+     * @var array
      */
-    protected $description;
+    protected $options;
 
     /**
      * LoggingPassthroughImageManipulation constructor.
      *
-     * @param ManipulationDescriptionInterface $description
+     * @param array $options
      */
-    public function __construct(ManipulationDescriptionInterface $description)
+    public function __construct(array $options)
     {
-        $this->description = $description;
+        $this->options = $options;
     }
 
     /**
@@ -40,12 +39,12 @@ class LoggingPassthroughImageManipulation implements ImageManipulationInterface
     }
 
     /**
-     * @param ManipulationDescriptionInterface $description
+     * @param array $options
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description): LoggingPassthroughImageManipulation
+    public static function fromOptions(array $options): LoggingPassthroughImageManipulation
     {
-        return new static();
+        return new static($options);
     }
 
     /**
@@ -55,7 +54,7 @@ class LoggingPassthroughImageManipulation implements ImageManipulationInterface
     public function applyTo(ImageBlobInterface $image): ImageBlobInterface
     {
         $this->systemLogger->log(
-            sprintf('LoggingPassthroughImageManipulation was applied to blob of class "%s" and previously created with description of class "%s"', get_class($image), get_class($this->description)),
+            sprintf('LoggingPassthroughImageManipulation was applied to blob of class "%s" and previously created with options: %s', get_class($image), json_encode($this->options)),
             LOG_DEBUG,
             null,
             'ImageBlob'

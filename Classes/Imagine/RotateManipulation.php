@@ -2,7 +2,6 @@
 namespace Kitsunet\ImageManipulation\Imagine;
 
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 
 /**
@@ -33,18 +32,27 @@ class RotateManipulation implements ImageManipulationInterface
      */
     public function applyTo(ImageBlobInterface $image): ImageBlobInterface
     {
-        $imagine = $this->getImagineImage($image);
+        $image = $this->upgradeToImagineBlob($image);
+
+        $imagine = $image->getImagineImage();
         $imagine = $imagine->rotate($this->angle);
         return ImagineImageBlob::fromImagineImage($imagine, $image->getMetadata());
     }
 
     /**
-     * @param ManipulationDescriptionInterface $description
+     * @param array $options
      * @return static
      */
-    public static function fromDescription(ManipulationDescriptionInterface $description)
+    public static function fromOptions(array $options)
     {
-        $options = $description->getOptions();
-        return new static((int)round($options['angle']));
+        if (!isset($options['angle'])) {
+            throw new \InvalidArgumentException(sprintf('The "%s" requires an "angle" option to be set to an integer.', static::class), 1501668628932);
+        }
+        $angle = (int)round((float)$options['angle']);
+
+        /* TODO: Could also allow background image, but needs a ColorInterface of imagine,
+           to decide how to provide the information for that. */
+
+        return new static($angle);
     }
 }

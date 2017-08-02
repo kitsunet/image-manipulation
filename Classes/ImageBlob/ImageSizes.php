@@ -22,6 +22,12 @@ class ImageSizes
     protected $imageBlobFactory;
 
     /**
+     * @Flow\Inject
+     * @var PersistentResourceHelper
+     */
+    protected $imageManipulator;
+
+    /**
      * @param PersistentResource $resource
      * @return array
      */
@@ -31,7 +37,7 @@ class ImageSizes
 
         $imageSize = $this->imageSizeCache->get($cacheIdentifier);
         if ($imageSize === false) {
-            $imageSize = $this->calculateImageSize($resource->getStream());
+            $imageSize = $this->calculateImageSize($resource);
             $this->imageSizeCache->set($cacheIdentifier, $imageSize);
         }
 
@@ -51,14 +57,14 @@ class ImageSizes
     }
 
     /**
-     * @param resource $stream
+     * @param PersistentResource $resource
      * @return array
      * @throws ImageFileException
      */
-    protected function calculateImageSize($stream): array
+    protected function calculateImageSize(PersistentResource $resource): array
     {
         try {
-            $blob = $this->imageBlobFactory->create($stream, new BlobMetadata([]));
+            $blob = $this->imageBlobFactory->create($resource->getStream(), $this->imageManipulator->prepareMetadata($resource));
             $sizeBox = $blob->getSize();
             $imageSize = ['width' => $sizeBox->getWidth(), 'height' => $sizeBox->getHeight()];
         } catch (\Exception $e) {

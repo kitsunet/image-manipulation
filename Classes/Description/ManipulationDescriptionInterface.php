@@ -1,5 +1,5 @@
 <?php
-namespace Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description;
+namespace Kitsunet\ImageManipulation\Description;
 
 /**
  * Manipulation descriptions are a meta format for descripting generic

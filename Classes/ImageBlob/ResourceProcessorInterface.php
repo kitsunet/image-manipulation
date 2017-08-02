@@ -1,6 +1,7 @@
 <?php
 namespace Kitsunet\ImageManipulation\ImageBlob;
 
+use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Neos\Flow\ResourceManagement\PersistentResource;
 
 /**
@@ -10,8 +11,8 @@ interface ResourceProcessorInterface
 {
     /**
      * @param PersistentResource $originalResource
-     * @param array $manipulationDescriptions
+     * @param ImageManipulationInterface[] $manipulations
      * @return array resource, width, height as keys
      */
-    public function processResource(PersistentResource $originalResource, array $manipulationDescriptions);
+    public function processResource(PersistentResource $originalResource, array $manipulations);
 }

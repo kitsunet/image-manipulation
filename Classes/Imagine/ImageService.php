@@ -1,14 +1,11 @@
 <?php
 namespace Kitsunet\ImageManipulation\Imagine;
 
-use Imagine\Image\ImagineInterface;
-use Kitsunet\ImageManipulation\Blob\BlobMetadata;
 use Kitsunet\ImageManipulation\ImageBlob\BoxInterface;
 use Kitsunet\ImageManipulation\ImageBlob\DescriptionMappingServiceInterface;
 use Kitsunet\ImageManipulation\ImageBlob\ImageBlobInterface;
-use Kitsunet\ImageManipulation\ImageBlob\ImageManipulator;
+use Kitsunet\ImageManipulation\ImageBlob\PersistentResourceHelper;
 use Kitsunet\ImageManipulation\ImageBlob\ImageServiceInterface;
-use Kitsunet\ImageManipulation\ImageBlob\Manipulation\Description\ManipulationDescriptionInterface;
 use Kitsunet\ImageManipulation\ImageBlob\Manipulation\ImageManipulationInterface;
 use Kitsunet\ImageManipulation\ImageBlob\PassthroughImageManipulation;
 use Kitsunet\ImageManipulation\ImageBlob\ResourceProcessorInterface;
@@ -24,77 +21,46 @@ use Neos\Utility\Arrays;
 class ImageService implements ImageServiceInterface, ResourceProcessorInterface
 {
     /**
-     * @Flow\Inject
-     * @var DescriptionMappingServiceInterface
+     * @var PersistentResourceHelper
      */
-    protected $descriptionMappingService;
+    protected $persistentResourceHelper;
 
     /**
-     * @var ImagineInterface
+     * @var ImageBlobFactory
      */
-    protected $imagineService;
-
-
-    /**
-     * @var ImageManipulator
-     */
-    protected $imageManipulator;
+    protected $imageBlobFactory;
 
     /**
-     * @var array
+     * @param ImageBlobFactory $imageBlobFactory
      */
-    protected $imageOptions = [];
-
-    /**
-     * @param ImagineInterface $imagineService
-     */
-    public function injectImagineService(ImagineInterface $imagineService)
+    public function injectImageBlobFactory(ImageBlobFactory $imageBlobFactory)
     {
-        $this->imagineService = $imagineService;
+        $this->imageBlobFactory = $imageBlobFactory;
     }
 
     /**
-     * @param ImageManipulator $imageManipulator
+     * @param PersistentResourceHelper $persistentResourceHelper
      */
-    public function injectImageManipulator(ImageManipulator $imageManipulator)
+    public function injectPersistentResourceHelper(PersistentResourceHelper $persistentResourceHelper)
     {
-        $this->imageManipulator = $imageManipulator;
-    }
-
-    /**
-     * @param array $imageOptions
-     */
-    public function injectImageOptions(array $imageOptions)
-    {
-        $this->imageOptions = $imageOptions;
+        $this->persistentResourceHelper = $persistentResourceHelper;
     }
 
     /**
      * @param PersistentResource $originalResource
-     * @param ManipulationDescriptionInterface[] $manipulationDescriptions
+     * @param ImageManipulationInterface[] $manipulations
      * @return array resource, width, height as keys
      * @throws InvalidConfigurationException
      * @throws Exception
      */
-    public function processResource(PersistentResource $originalResource, array $manipulationDescriptions)
+    public function processResource(PersistentResource $originalResource, array $manipulations)
     {
-        $blobMetadata = $this->imageManipulator->prepareMetadata(['options' => $this->getOptionsMergedWithDefaults()], $originalResource);
-        $blob = ImagineImageBlob::fromStream($originalResource->getStream(), $blobMetadata);
+        $blobMetadata = $this->persistentResourceHelper->prepareMetadata($originalResource);
+        $blob = $this->imageBlobFactory->create($originalResource->getStream(), $blobMetadata);
 
-        $newImageBlob =  $this->process($blob, $manipulationDescriptions);
-        $newResource = $this->imageManipulator->storeImageBlob($blob);
-        return $this->prepareReturnValue($newResource, $newImageBlob->getSize());
-    }
-
-    /**
-     * @param ImageBlobInterface $blob
-     * @param ManipulationDescriptionInterface[] $manipulationDescriptions
-     * @return ImageBlobInterface
-     */
-    public function process(ImageBlobInterface $blob, array $manipulationDescriptions)
-    {
-        $manipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($manipulationDescriptions, $blob);
-        return $this->manipulate($blob, $manipulations);
+        $blob = $this->manipulate($blob, $manipulations);
+        $newResource = $this->persistentResourceHelper->storeImageBlob($blob, $originalResource->getCollectionName());
+        return $this->prepareReturnValue($newResource, $blob->getSize());
     }
 
     /**
@@ -105,15 +71,15 @@ class ImageService implements ImageServiceInterface, ResourceProcessorInterface
     public function manipulate(ImageBlobInterface $blob, array $manipulations)
     {
         // TODO: Special handling for SVG should be refactored at a later point.
-        if ($blob->getMetadata()->getProperty('mediaType') === 'image/svg+xml') {
+        if ($blob->getMetadata()->getMediaType() === 'image/svg+xml') {
             return $blob;
         }
 
         if ($this->shouldHandleAnimatedGif($blob)) {
             $blob = $this->processAnimatedGif($blob, $manipulations);
         } else {
-            $manipulations = $this->imageManipulator->wrapManipulations($blob, $manipulations);
-            $blob = $this->imageManipulator->applyManipulationsToBlob($blob, $manipulations);
+            $manipulations = $this->persistentResourceHelper->wrapManipulations($blob, $manipulations);
+            $blob = $manipulations->applyTo($blob);
         }
 
         return $blob;
@@ -125,7 +91,7 @@ class ImageService implements ImageServiceInterface, ResourceProcessorInterface
      */
     protected function shouldHandleAnimatedGif(ImagineImageBlob $blob)
     {
-        if (!$this->imagineService instanceof \Imagine\Imagick\Imagine) {
+        if (!($blob->getImagineImage() instanceof \Imagine\Imagick\Image)) {
             return false;
         }
 
@@ -154,14 +120,23 @@ class ImageService implements ImageServiceInterface, ResourceProcessorInterface
         /** @var \Imagine\Imagick\Image $imagineImage */
         $imagineImage = $blob->getImagineImage();
         $metadata = $blob->getMetadata();
+
+        $newMetadata = $metadata->withOptions(Arrays::arrayMergeRecursiveOverrule($metadata->getOptions(), [
+            'imagine' => [
+                'animated' => true,
+                'animated.delay' => $imagineImage->getImagick()->getImageDelay() * 10,
+                'animated.loops' => $imagineImage->getImagick()->getImageIterations()
+            ]
+        ]));
+
         $layers = $imagineImage->layers();
         $layers->coalesce();
         $newLayers = [];
         foreach ($layers as $index => $imagineFrame) {
-            $layerBlob = ImagineImageBlob::fromImagineImage($imagineFrame, $metadata);
+            $layerBlob = ImagineImageBlob::fromImagineImage($imagineFrame, $newMetadata);
             /** @var ImagineImageBlob $layerBlob */
-            $wrappedManipulations = $this->imageManipulator->wrapManipulations($layerBlob, $manipulations);
-            $layerBlob = $this->imageManipulator->applyManipulationsToBlob($layerBlob, $wrappedManipulations);
+            $wrappedManipulations = $this->persistentResourceHelper->wrapManipulations($layerBlob, $manipulations);
+            $layerBlob = $wrappedManipulations->applyTo($layerBlob);
             $newLayers[] = $layerBlob->getImagineImage();
         }
 
@@ -171,34 +146,8 @@ class ImageService implements ImageServiceInterface, ResourceProcessorInterface
             $layers->add($imagineFrame);
         }
 
-        $metadataArray = $metadata->toArray();
-        $metadataArray['options']['animated'] = true;
-        $metadataArray['options']['animated.delay'] = $imagineImage->getImagick()->getImageDelay() * 10;
-        $metadataArray['options']['animated.loops'] = $imagineImage->getImagick()->getImageIterations();
-
-        return ImagineImageBlob::fromImagineImage($imagineImage, new BlobMetadata($metadataArray));
-    }
-
-    /**
-     * @param array $additionalOptions
-     * @return array
-     * @throws InvalidConfigurationException
-     */
-    protected function getOptionsMergedWithDefaults(array $additionalOptions = [])
-    {
-        $defaultOptions = Arrays::arrayMergeRecursiveOverrule($this->imageOptions, $additionalOptions);
-        $quality = isset($defaultOptions['quality']) ? (integer)$defaultOptions['quality'] : 90;
-        if ($quality < 0 || $quality > 100) {
-            throw new InvalidConfigurationException(
-                sprintf('Setting "Neos.Media.image.defaultOptions.quality" allow only value between 0 and 100, current value: %s', $quality),
-                1404982574
-            );
-        }
-        $defaultOptions['jpeg_quality'] = $quality;
-        // png_compression_level should be an integer between 0 and 9 and inverse to the quality level given. So quality 100 should result in compression 0.
-        $defaultOptions['png_compression_level'] = (9 - ceil($quality * 9 / 100));
-
-        return $defaultOptions;
+        $blob = ImagineImageBlob::fromImagineImage($imagineImage, $newMetadata);
+        return $blob;
     }
 
     /**

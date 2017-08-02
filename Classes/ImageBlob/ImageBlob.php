@@ -57,7 +57,7 @@ class ImageBlob implements ImageBlobInterface
      */
     public function getSize(): BoxInterface
     {
-        $fileExtension = $this->blobMetadata->getProperty('fileExtension') ?? 'png';
+        $fileExtension = MediaTypes::getFilenameExtensionFromMediaType($this->blobMetadata->getMediaType());
         $temporaryFilename = $this->getTemporaryFilename($fileExtension);
         $temporaryFile = fopen($temporaryFilename, 'w');
         stream_copy_to_stream($this->stream, $temporaryFile);
