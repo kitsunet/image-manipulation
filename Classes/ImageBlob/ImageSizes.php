@@ -64,7 +64,7 @@ class ImageSizes
     protected function calculateImageSize(PersistentResource $resource): array
     {
         try {
-            $blob = $this->imageBlobFactory->create($resource->getStream(), $this->imageManipulator->prepareMetadata($resource));
+            $blob = new ImageBlob($resource->getStream(), $this->imageManipulator->prepareMetadata($resource));
             $sizeBox = $blob->getSize();
             $imageSize = ['width' => $sizeBox->getWidth(), 'height' => $sizeBox->getHeight()];
         } catch (\Exception $e) {

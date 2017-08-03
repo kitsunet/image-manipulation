@@ -99,6 +99,7 @@ class PersistentResourceHelper
      */
     public function wrapManipulations(ImageBlobInterface $imageBlob, array $manipulations): Manipulator
     {
+        // TODO: Move and re-enable functionality
         return new Manipulator($manipulations);
         $preManipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($this->preDescriptions, $imageBlob);
         $postManipulations = $this->descriptionMappingService->mapDescriptionsToManipulations($this->postDescriptions, $imageBlob);

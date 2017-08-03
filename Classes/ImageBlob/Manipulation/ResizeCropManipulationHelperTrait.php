@@ -129,7 +129,7 @@ trait ResizeCropManipulationHelperTrait
         $ratio = min($ratios);
         $newDimensions = $newDimensions->scale($ratio);
 
-        if ($this->options['allowUpscaling'] === false && $originalDimensions->contains($newDimensions) === false) {
+        if ($this->options['allowUpScaling'] === false && $originalDimensions->contains($newDimensions) === false) {
             return clone $originalDimensions;
         }
 
@@ -149,7 +149,7 @@ trait ResizeCropManipulationHelperTrait
     {
         $newDimensions = new Box($requestedWidth, $requestedHeight);
 
-        if ($this->options['allowUpscaling'] === true || $originalDimensions->contains($newDimensions) === true) {
+        if ($this->options['allowUpScaling'] === true || $originalDimensions->contains($newDimensions) === true) {
             return $newDimensions;
         }
 
@@ -174,7 +174,7 @@ trait ResizeCropManipulationHelperTrait
      */
     protected function calculateScalingToWidth(BoxInterface $originalDimensions, int $requestedWidth): BoxInterface
     {
-        if ($this->options['allowUpscaling'] === false && $requestedWidth >= $originalDimensions->getWidth()) {
+        if ($this->options['allowUpScaling'] === false && $requestedWidth >= $originalDimensions->getWidth()) {
             return $originalDimensions;
         }
 
@@ -193,7 +193,7 @@ trait ResizeCropManipulationHelperTrait
      */
     protected function calculateScalingToHeight(BoxInterface $originalDimensions, int $requestedHeight): BoxInterface
     {
-        if ($this->options['allowUpscaling'] === false && $requestedHeight >= $originalDimensions->getHeight()) {
+        if ($this->options['allowUpScaling'] === false && $requestedHeight >= $originalDimensions->getHeight()) {
             return $originalDimensions;
         }
 

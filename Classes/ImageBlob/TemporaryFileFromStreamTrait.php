@@ -24,7 +24,7 @@ trait TemporaryFileFromStreamTrait
     {
         if ($this->_temporaryFilename === null) {
             $extension = $fileExtension ? '.' . $fileExtension : '';
-            $this->_temporaryFilename = FLOW_PATH_TEMPORARY . 'imageblob_temporary_' . getmypid() . '_' . spl_object_hash($this) . $extension;
+            $this->_temporaryFilename = FLOW_PATH_TEMPORARY . 'imageblob_temporary_' . getmypid() . '_' . spl_object_hash($this) . '.' . $extension;
         }
 
         return $this->_temporaryFilename;

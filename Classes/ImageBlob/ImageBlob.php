@@ -2,6 +2,7 @@
 namespace Kitsunet\ImageManipulation\ImageBlob;
 
 use Kitsunet\ImageManipulation\Blob\BlobMetadata;
+use Neos\Utility\MediaTypes;
 
 /**
  * This is a generic ImageBlob implementation to be used as fallback and reference.
@@ -65,6 +66,9 @@ class ImageBlob implements ImageBlobInterface
 
         try {
             list($width, $height) = getimagesize($temporaryFilename);
+            if (empty($width) || empty($height)) {
+                return new EmptyBox();
+            }
             return new Box($width, $height);
         } catch (\Exception $exception) {
             return new EmptyBox();
