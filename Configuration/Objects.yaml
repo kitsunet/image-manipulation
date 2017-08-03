@@ -8,7 +8,7 @@ Kitsunet\ImageManipulation\ImageBlob\ImageSizes:
           1:
             value: Neos_Media_ImageSize
 
-Kitsunet\ImageManipulation\ImageBlob\ImageManipulator:
+Kitsunet\ImageManipulation\ImageBlob\PersistentResourceHelper:
   properties:
     preDescriptions:
       setting: Kitsunet.ImageManipulation.ImageBlob.preDescriptions
